@@ -212,7 +212,8 @@ for (let index = 0; index < 5 && !difficultyIncreased; index += 1) {
 if (!difficultyIncreased) fail("adaptive_sequence_did_not_raise_difficulty_after_repeated_success");
 ok("adaptive_success_sequence_changed_difficulty");
 const nextQuestion = selectNextQuestion({ questions: seed.questions, targetDifficulty: currentProgress.difficulty, previousQuestionId: lastQuestionId });
-if (!nextQuestion.question || nextQuestion.question.id === lastQuestionId || Math.abs(nextQuestion.question.difficulty - currentProgress.difficulty) > 2) fail("next_question_selection_invalid");
+const closestAvailableDistance = Math.min(...seed.questions.filter((question) => question.id !== lastQuestionId).map((question) => Math.abs(question.difficulty - currentProgress.difficulty)));
+if (!nextQuestion.question || nextQuestion.question.id === lastQuestionId || Math.abs(nextQuestion.question.difficulty - currentProgress.difficulty) !== closestAvailableDistance) fail("next_question_selection_invalid");
 ok("next_question_selected_from_updated_difficulty");
 
 const duplicateKey = crypto.randomUUID();

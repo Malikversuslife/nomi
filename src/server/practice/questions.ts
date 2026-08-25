@@ -3,6 +3,10 @@ import type { PracticeQuestion as DomainPracticeQuestion } from "@/domain/practi
 import type { Json, PracticeQuestion } from "@/server/supabase/types";
 
 export type LearnerSafePracticeQuestion = Omit<DomainPracticeQuestion, "expectedAnswer" | "explanation" | "misconceptionKey" | "misconceptionCategory">;
+export type LearnerSafePracticeQuestionWithMeta = LearnerSafePracticeQuestion & {
+  hint?: string;
+  source?: "seeded" | "ai_generated";
+};
 
 function mapOptions(options: Json | null): DomainPracticeQuestion["options"] {
   if (!Array.isArray(options)) {
@@ -37,14 +41,16 @@ export function mapPracticeQuestion(row: PracticeQuestion): DomainPracticeQuesti
   };
 }
 
-export function toLearnerSafeQuestion(question: DomainPracticeQuestion): LearnerSafePracticeQuestion {
+export function toLearnerSafeQuestion(question: DomainPracticeQuestion, meta?: { id?: string; hint?: string; source?: "seeded" | "ai_generated" }): LearnerSafePracticeQuestionWithMeta {
   return {
-    id: question.id,
+    id: meta?.id ?? question.id,
     topicId: question.topicId,
     conceptName: question.conceptName,
     difficulty: question.difficulty,
     questionType: question.questionType,
     prompt: question.prompt,
     options: question.options,
+    hint: meta?.hint,
+    source: meta?.source ?? "seeded",
   };
 }

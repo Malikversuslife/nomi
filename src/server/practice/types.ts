@@ -1,9 +1,10 @@
-import type { LearnerSafePracticeQuestion } from "./questions";
+import type { LearnerSafePracticeQuestionWithMeta } from "./questions";
 
 export type PracticeResult = {
   correct: boolean;
   correctAnswer: string;
   explanation: string;
+  hint?: string;
   mastery: number;
   masteryChange: number;
   difficulty: number;
@@ -14,12 +15,12 @@ export type PracticeResult = {
   consecutiveCorrect: number;
   consecutiveIncorrect: number;
   attemptInserted: boolean;
-  nextQuestion: LearnerSafePracticeQuestion | null;
+  nextQuestion: LearnerSafePracticeQuestionWithMeta | null;
   nextQuestionReasonCode: string;
 };
 
 export type PracticeActionState = {
-  question?: LearnerSafePracticeQuestion | null;
+  question?: LearnerSafePracticeQuestionWithMeta | null;
   result?: PracticeResult;
   message?: string;
 };

@@ -22,7 +22,7 @@ export function PracticeHarness({ initialState }: { initialState: PracticeAction
         <input name="questionId" type="hidden" value={question.id} />
         <input name="questionType" type="hidden" value={question.questionType} />
         <input name="submissionKey" type="hidden" defaultValue={newSubmissionKey()} />
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">Difficulty {question.difficulty}</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">Difficulty {question.difficulty}{question.source === "ai_generated" ? " · Generated" : ""}</p>
         <h2 className="font-display text-2xl font-bold text-nomi-ink">{question.prompt}</h2>
         <p className="text-sm text-nomi-muted">Concept: {question.conceptName}</p>
 
@@ -54,6 +54,7 @@ export function PracticeHarness({ initialState }: { initialState: PracticeAction
         <section className="space-y-3 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-5 shadow-sm">
           <h2 className="font-display text-2xl font-bold">{state.result.correct ? "Correct" : "Not quite"}</h2>
           <p className="text-sm text-nomi-muted">Answer: {state.result.correctAnswer}</p>
+          {state.result.hint ? <p className="text-sm text-nomi-muted">Hint: {state.result.hint}</p> : null}
           <p className="text-sm text-nomi-muted">{state.result.explanation}</p>
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div className="rounded-[var(--nomi-radius-medium)] bg-nomi-background p-3">
