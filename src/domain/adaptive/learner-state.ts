@@ -15,7 +15,7 @@ export function deriveLearnerState(input: LearnerStateInput): LearnerState {
         key: input.misconceptionKey,
         currentStatus: input.misconceptionStatus,
         occurrenceCount: input.misconceptionOccurrenceCount,
-        recentAttempts: input.attempts.slice(-8),
+        recentAttempts: (input.misconceptionAttempts ?? input.attempts).slice(-8),
       })
     : null;
   const difficultyDecision = decideDifficulty({

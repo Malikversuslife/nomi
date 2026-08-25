@@ -87,6 +87,7 @@ export type LearnerStateInput = {
   currentMastery?: Mastery;
   currentDifficulty?: Difficulty;
   attempts: AdaptiveAttempt[];
+  misconceptionAttempts?: AdaptiveAttempt[];
   misconceptionKey?: string | null;
   misconceptionStatus?: MisconceptionStatus;
   misconceptionOccurrenceCount?: number;
