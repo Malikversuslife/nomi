@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title desc">
+  <title id="title">Nomi touch icon</title>
+  <desc id="desc">A small purple Nomi placeholder touch icon.</desc>
+  <rect width="180" height="180" rx="42" fill="#FBF9F6"/>
+  <path fill="#8B5DE3" d="M54 76c0-29 16-52 36-52s36 23 36 52v28c0 29-16 52-36 52s-36-23-36-52V76Z"/>
+  <circle cx="77" cy="87" r="6" fill="#FFFFFF"/>
+  <circle cx="103" cy="87" r="6" fill="#FFFFFF"/>
+  <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-width="6" d="M77 109c8 7 18 7 26 0"/>
+</svg>

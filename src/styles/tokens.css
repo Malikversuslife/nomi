@@ -1,0 +1,31 @@
+:root {
+  --nomi-purple-700: #6538b6;
+  --nomi-purple-600: #7748d0;
+  --nomi-purple-500: #8b5de3;
+  --nomi-purple-100: #eee6fb;
+
+  --nomi-mint-500: #6dd8b5;
+  --nomi-mint-100: #ddf7ee;
+
+  --nomi-yellow-500: #f4c94f;
+  --nomi-yellow-100: #fff4c7;
+
+  --nomi-pink-500: #ef8eb7;
+  --nomi-pink-100: #fce2ec;
+
+  --nomi-ink: #25232b;
+  --nomi-muted: #716d79;
+  --nomi-surface: #ffffff;
+  --nomi-background: #fbf9f6;
+  --nomi-border: #e9e4ec;
+
+  --nomi-radius-small: 12px;
+  --nomi-radius-medium: 16px;
+  --nomi-radius-large: 24px;
+  --nomi-radius-pill: 999px;
+
+  --nomi-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nomi-safe-left: env(safe-area-inset-left, 0px);
+  --nomi-safe-right: env(safe-area-inset-right, 0px);
+  --nomi-safe-top: env(safe-area-inset-top, 0px);
+}
