@@ -9,7 +9,7 @@ export default function HomePage() {
           Learns how you learn.
         </h1>
         <p className="mt-4 max-w-xl text-base leading-7 text-nomi-muted">
-          The Supabase, auth, and curriculum foundation is ready for verification. Adaptive learning, AI, practice, and full product screens are intentionally not implemented yet.
+          Nomi is ready to help you learn. Sign in or create your learner profile to get started.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link className="inline-flex min-h-12 items-center justify-center rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-white" href="/auth/sign-in">

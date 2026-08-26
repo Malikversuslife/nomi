@@ -8,9 +8,9 @@ export default async function PracticePage() {
   return (
     <FoundationShell active="Learn">
       <section className="mb-5 space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">Practice harness</p>
-        <h1 className="font-display text-4xl font-bold tracking-[-0.04em]">Adaptive data flow</h1>
-        <p className="text-nomi-muted">Seeded questions only. This verifies persistence and deterministic adaptation, not final Practice UI.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">Practice</p>
+        <h1 className="font-display text-4xl font-bold tracking-[-0.04em]">Keep learning</h1>
+        <p className="text-nomi-muted">Nomi will adapt questions to help you learn.</p>
       </section>
       <PracticeHarness initialState={initialState} />
     </FoundationShell>

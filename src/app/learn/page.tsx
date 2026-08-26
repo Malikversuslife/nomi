@@ -18,11 +18,15 @@ export default async function LearnPage() {
       <section className="space-y-4 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-5 shadow-sm">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">Learn</p>
-          <h1 className="font-display text-4xl font-bold tracking-[-0.04em]">Canonical topics</h1>
-          <p className="mt-2 text-nomi-muted">Foundation-only view of seeded subject and topic hierarchy.</p>
+          <h1 className="font-display text-4xl font-bold tracking-[-0.04em]">Your subjects</h1>
+          <p className="mt-2 text-nomi-muted">Browse your learning path through subjects, units, and topics.</p>
         </div>
+
         {subjects.map((subject) => (
-          <article key={subject.id} className="rounded-[var(--nomi-radius-large)] bg-nomi-background p-4">
+          <article
+            key={subject.id}
+            className="rounded-[var(--nomi-radius-large)] bg-nomi-background p-4 border-b"
+          >
             <h2 className="font-display text-xl font-bold">{subject.name}</h2>
             <TopicList topics={subject.topics} />
           </article>
