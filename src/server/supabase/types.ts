@@ -287,3 +287,5 @@ export type TopicProgress = Database["public"]["Tables"]["topic_progress"]["Row"
 export type PracticeQuestion = Database["public"]["Tables"]["practice_questions"]["Row"];
 export type PracticeAttempt = Database["public"]["Tables"]["practice_attempts"]["Row"];
 export type PersistedMisconceptionState = Database["public"]["Tables"]["misconception_state"]["Row"];
+export type TutorThread = Database["public"]["Tables"]["tutor_threads"]["Row"];
+export type TutorMessage = Database["public"]["Tables"]["tutor_messages"]["Row"];
