@@ -1,8 +1,6 @@
 import "server-only";
-import {
-  getSubjectsWithTopicHierarchy,
-  type SubjectWithTopics,
-} from "@/server/data/curriculum";
+import { getSubjectsWithTopicHierarchy, type SubjectWithTopics } from "@/server/data/curriculum";
+import { getLearnerSubjects } from "@/server/data/learner";
 import { createServerSupabaseClient } from "@/server/supabase/server";
 import type { Topic } from "@/server/supabase/types";
 import type { TopicNode } from "@/domain/subjects/topic-tree";
@@ -129,6 +127,7 @@ function resolveDefaultSubjectSlug(
   subjectsWithTopics: SubjectWithTopics[],
   mostRecentTopicId: string | null,
   topicById: Map<string, Topic>,
+  learnerSubjectSlug: string | null,
 ): string | null {
   let slug: string | null = null;
 
@@ -139,13 +138,19 @@ function resolveDefaultSubjectSlug(
     }
   }
 
+  if (!slug && learnerSubjectSlug) {
+    slug = subjectsWithTopics.some((s) => s.slug === learnerSubjectSlug)
+      ? learnerSubjectSlug
+      : null;
+  }
+
   return slug ?? subjectsWithTopics[0]?.slug ?? null;
 }
 
 export async function buildLearnExperience(userId: string): Promise<LearnExperienceData> {
   const supabase = await createServerSupabaseClient();
 
-  const [subjectsWithTopics, progressResult] = await Promise.all([
+  const [subjectsWithTopics, progressResult, learnerSubjects] = await Promise.all([
     getSubjectsWithTopicHierarchy(),
     supabase
       .from("topic_progress")
@@ -154,6 +159,7 @@ export async function buildLearnExperience(userId: string): Promise<LearnExperie
       )
       .eq("user_id", userId)
       .order("updated_at", { ascending: false }),
+    getLearnerSubjects(userId),
   ]);
 
   if (progressResult.error) {
@@ -183,6 +189,12 @@ export async function buildLearnExperience(userId: string): Promise<LearnExperie
 
   const mostRecentTopicId = progressRows[0]?.topic_id ?? null;
 
+  // Fall back to the learner's enrolled subject (set by onboarding) when there
+  // is no practice history yet, before defaulting to the first curriculum subject.
+  const learnerSubjectSlug =
+    (learnerSubjects[0] as { subjects?: { slug?: string } | null } | null | undefined)
+      ?.subjects?.slug ?? null;
+
   const subjects: LearnSubjectView[] = subjectsWithTopics.map((subject) => ({
     slug: subject.slug,
     name: subject.name,
@@ -193,7 +205,12 @@ export async function buildLearnExperience(userId: string): Promise<LearnExperie
 
   return {
     subjects,
-    defaultSubjectSlug: resolveDefaultSubjectSlug(subjectsWithTopics, mostRecentTopicId, topicById),
+    defaultSubjectSlug: resolveDefaultSubjectSlug(
+      subjectsWithTopics,
+      mostRecentTopicId,
+      topicById,
+      learnerSubjectSlug,
+    ),
     continueView: buildContinueView(mostRecentTopicId, topicById, subjectsWithTopics, progressMap),
     insightView: buildInsightView(mostRecentTopicId, topicById, interventionMap),
   };

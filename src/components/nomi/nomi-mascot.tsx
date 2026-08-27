@@ -45,6 +45,7 @@ export function NomiMascot({
         ${className}
       `}
       aria-hidden="true"
+      data-state={state as NomiMascotState}
     >
       <path
         d="M12 2L2 7h5v11H7v5h11v-5h-7v-11h5z"

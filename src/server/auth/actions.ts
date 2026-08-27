@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { hasSupabaseConfig } from "@/server/env";
 import { createServerSupabaseClient } from "@/server/supabase/server";
+import { resolvePostAuthDestination } from "@/server/onboarding/status";
 import { signInSchema, signUpSchema, type AuthFormState } from "./schemas";
 
 export async function signInAction(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -20,13 +21,17 @@ export async function signInAction(_state: AuthFormState, formData: FormData): P
   }
 
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
     return { message: error.message };
   }
 
-  redirect("/home");
+  if (!data.user) {
+    return { message: "Unable to sign in." };
+  }
+
+  redirect(await resolvePostAuthDestination(data.user.id));
 }
 
 export async function signUpAction(_state: AuthFormState, formData: FormData): Promise<AuthFormState> {
@@ -63,7 +68,11 @@ export async function signUpAction(_state: AuthFormState, formData: FormData): P
     return { message: "Check your email to confirm your account, then sign in." };
   }
 
-  redirect("/home");
+  if (!data.user) {
+    return { message: "Unable to finish creating your account." };
+  }
+
+  redirect(await resolvePostAuthDestination(data.user.id));
 }
 
 export async function signOutAction() {

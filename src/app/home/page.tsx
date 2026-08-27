@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { ConfigurationNotice } from "@/components/app-shell/configuration-notice";
 import { FoundationShell } from "@/components/app-shell/foundation-shell";
 import { NomiGreeting } from "@/components/nomi/nomi-greeting";
@@ -8,6 +9,7 @@ import { RecentLearning } from "@/components/learner/recent-learning";
 import { hasSupabaseConfig } from "@/server/env";
 import { getSubjectsWithTopicHierarchy } from "@/server/data/curriculum";
 import { getLearnerSubjects, getProfile, getTopicProgress } from "@/server/data/learner";
+import { getOnboardingStatus } from "@/server/onboarding/status";
 import { requireUser } from "@/server/supabase/auth";
 
 const DISPLAY_SUBJECTS = ["Mathematics", "Physics", "Chemistry", "Biology"];
@@ -18,12 +20,19 @@ export default async function HomeRoutePage() {
   }
 
   const user = await requireUser();
+  const status = await getOnboardingStatus(user.id);
   const [profile, subjects, learnerSubjects, topicProgress] = await Promise.all([
     getProfile(user.id),
     getSubjectsWithTopicHierarchy(),
     getLearnerSubjects(user.id),
     getTopicProgress(user.id),
   ]);
+
+  // A genuinely new learner lands in onboarding rather than a blank Home.
+  // Skipped when there is no curriculum, so onboarding cannot trap them.
+  if (status === "needs-onboarding" && subjects.length > 0) {
+    redirect("/onboarding");
+  }
 
   const displayName = profile?.display_name ?? undefined;
 
