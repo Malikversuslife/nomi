@@ -32,9 +32,9 @@ export function NomiRecommendation({
 }) {
   if (!intervention) {
     return (
-      <section className="mb-5 flex items-center gap-3 rounded-[var(--nomi-radius-large)] border border-nomi-border/50 bg-nomi-background px-4 py-3 sm:mb-6">
-        <NomiMascot state="neutral" size={32} />
-        <p className="text-sm text-nomi-muted">
+      <section className="mb-5 flex items-center gap-3 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle px-4 py-3 sm:mb-6">
+        <NomiMascot state="neutral" size={40} className="flex-shrink-0" />
+        <p className="text-sm leading-relaxed text-nomi-muted">
           Complete a practice session and Nomi will have recommendations for you.
         </p>
       </section>
@@ -44,17 +44,15 @@ export function NomiRecommendation({
   const message = interventionCopy[intervention](topicName);
 
   return (
-    <section className="mb-5 rounded-[var(--nomi-radius-large)] border border-nomi-border/50 bg-nomi-background px-4 py-4 sm:mb-6">
-      <div className="flex items-start gap-3">
-        <NomiMascot state="curious" size={32} className="mt-0.5 flex-shrink-0" />
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-nomi-purple-600">
-            Nomi recommends
-          </p>
-          <p className="text-sm font-medium leading-relaxed text-nomi-ink">
-            {message}
-          </p>
-        </div>
+    <section className="mb-5 flex items-start gap-3 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle px-4 py-4 sm:mb-6">
+      <NomiMascot state="curious" size={40} className="mt-0.5 flex-shrink-0" />
+      <div>
+        <p className="text-xs font-semibold tracking-[0.06em] text-nomi-purple-700">
+          Nomi recommends
+        </p>
+        <p className="mt-1 text-sm font-medium leading-relaxed text-nomi-ink">
+          {message}
+        </p>
       </div>
     </section>
   );

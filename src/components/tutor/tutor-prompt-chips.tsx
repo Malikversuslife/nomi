@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 export function TutorPromptChips({
   prompts,
   onFill,
@@ -14,15 +16,16 @@ export function TutorPromptChips({
   return (
     <div className="flex flex-wrap gap-2" aria-label="Suggested questions">
       {prompts.map((prompt) => (
-        <button
+        <Button
           key={prompt}
           type="button"
+          variant="secondary"
+          size="sm"
           disabled={disabled}
           onClick={() => onFill(prompt)}
-          className="min-h-11 rounded-[var(--nomi-radius-pill)] border border-nomi-border bg-nomi-surface px-3.5 text-[13px] font-semibold text-nomi-muted transition-colors hover:border-nomi-purple-500 hover:text-nomi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {prompt}
-        </button>
+        </Button>
       ))}
     </div>
   );

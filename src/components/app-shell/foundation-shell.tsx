@@ -1,23 +1,32 @@
 import Link from "next/link";
+import {
+  Atom02Icon,
+  BookOpen01Icon,
+  ChartNoAxesColumnIncreasingIcon,
+  ChatBotIcon,
+  Home01Icon,
+} from "@hugeicons/core-free-icons";
+import type { IconSvgElement } from "@hugeicons/react";
 import { hasSupabaseConfig } from "@/server/env";
 import { SignOutButton } from "@/components/app-shell/sign-out-button";
 import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { AppIcon } from "@/components/ui/app-icon";
 
-import { Home, BookOpen, Bot, ChartNoAxesColumnIncreasing, Atom } from "lucide-react";
+type NavItem = { href: string; label: string; icon: IconSvgElement };
 
-const desktopNavItems = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/learn", label: "Learn", icon: BookOpen },
-  { href: "/practice", label: "Practice", icon: Atom },
-  { href: "/nomi", label: "Nomi", icon: Bot },
-  { href: "/progress", label: "Progress", icon: ChartNoAxesColumnIncreasing },
+const desktopNavItems: NavItem[] = [
+  { href: "/home", label: "Home", icon: Home01Icon },
+  { href: "/learn", label: "Learn", icon: BookOpen01Icon },
+  { href: "/practice", label: "Practice", icon: Atom02Icon },
+  { href: "/nomi", label: "Nomi", icon: ChatBotIcon },
+  { href: "/progress", label: "Progress", icon: ChartNoAxesColumnIncreasingIcon },
 ];
 
-const mobileNavItems = [
-  { href: "/home", label: "Home", icon: Home },
-  { href: "/learn", label: "Learn", icon: BookOpen },
-  { href: "/nomi", label: "Nomi", icon: Bot },
-  { href: "/progress", label: "Progress", icon: ChartNoAxesColumnIncreasing },
+const mobileNavItems: NavItem[] = [
+  { href: "/home", label: "Home", icon: Home01Icon },
+  { href: "/learn", label: "Learn", icon: BookOpen01Icon },
+  { href: "/nomi", label: "Nomi", icon: ChatBotIcon },
+  { href: "/progress", label: "Progress", icon: ChartNoAxesColumnIncreasingIcon },
 ];
 
 export function FoundationShell({
@@ -43,16 +52,15 @@ export function FoundationShell({
       {/* Desktop sidebar: visible on lg+, hidden on mobile */}
       <aside
         aria-label="Main navigation"
-        className="hidden lg:flex lg:flex-col fixed inset-y-0 left-0 top-0 h-full w-64 border-r border-nomi-border bg-nomi-surface/95 px-4 pt-6"
+        className="fixed inset-y-0 left-0 top-0 hidden h-full w-64 flex-col border-r border-nomi-border bg-nomi-surface px-4 pt-6 lg:flex"
       >
         <div className="mb-8 flex items-center gap-3 px-2">
           <NomiMascot state="neutral" size={32} />
           <h2 className="font-display text-lg font-bold tracking-[-0.03em] text-nomi-ink">Nomi</h2>
         </div>
 
-        <nav className="flex-1 space-y-0.5">
+        <nav className="flex-1 space-y-1">
           {desktopNavItems.map((item) => {
-            const Icon = item.icon;
             const isActive = active === item.label;
 
             return (
@@ -60,16 +68,21 @@ export function FoundationShell({
                 key={item.href}
                 href={item.href}
                 className={`
-                  flex items-center gap-3 rounded-[var(--nomi-radius-medium)] px-3 py-2.5 text-sm font-medium transition-colors
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500
+                  flex items-center gap-3 rounded-[var(--nomi-radius-medium)] px-3 py-2.5 text-sm transition-colors duration-200
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-1
                   ${isActive
-                    ? "bg-nomi-purple-100/80 text-nomi-purple-700 font-semibold"
-                    : "text-nomi-muted hover:bg-nomi-purple-50 hover:text-nomi-ink"
+                    ? "bg-nomi-purple-100 font-semibold text-nomi-ink"
+                    : "font-medium text-nomi-muted hover:bg-nomi-purple-50 hover:text-nomi-ink"
                   }
                 `}
                 aria-current={isActive ? "page" : undefined}
               >
-                <Icon aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={isActive ? 2.4 : 2} />
+                <AppIcon
+                  icon={item.icon}
+                  className={isActive ? "text-nomi-purple-600" : "text-nomi-muted"}
+                  size={18}
+                  strokeWidth={isActive ? 2 : 1.75}
+                />
                 {item.label}
               </Link>
             );
@@ -90,12 +103,11 @@ function MobileNav({ active }: { active: string }) {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-nomi-border bg-nomi-surface/95 backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-nomi-border bg-nomi-surface lg:hidden"
       style={{ paddingBottom: "var(--nomi-safe-bottom)" }}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-4 pt-1.5 pb-1">
         {mobileNavItems.map((item) => {
-          const Icon = item.icon;
           const isActive = active === item.label;
 
           return (
@@ -103,18 +115,22 @@ function MobileNav({ active }: { active: string }) {
               <Link
                 className={`
                   flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-[var(--nomi-radius-pill)] px-2 py-1.5
-                  transition-colors
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500
-                  ${isActive
-                    ? "bg-nomi-purple-100 text-nomi-purple-700"
-                    : "text-nomi-muted"
-                  }
+                  transition-colors duration-200
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-1
+                  ${isActive ? "bg-nomi-purple-100" : ""}
                 `}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
               >
-                <Icon aria-hidden="true" size={20} strokeWidth={isActive ? 2.6 : 2} />
-                <span className={`text-[10px] leading-tight ${isActive ? "font-semibold" : "font-medium"}`}>
+                <AppIcon
+                  icon={item.icon}
+                  className={isActive ? "text-nomi-purple-600" : "text-nomi-muted"}
+                  size={20}
+                  strokeWidth={isActive ? 2 : 1.75}
+                />
+                <span
+                  className={`text-[10px] leading-tight ${isActive ? "font-semibold text-nomi-ink" : "font-medium text-nomi-muted"}`}
+                >
                   {item.label}
                 </span>
               </Link>

@@ -8,17 +8,6 @@ export type NomiMascotState =
   | "reinforcing"
   | "challenge";
 
-const stateClasses: Record<NomiMascotState, string> = {
-  neutral: "animate-neutral-6s ease-in-out loop",
-  thinking: "animate-thinking-3s ease-in-out loop",
-  curious: "animate-curious-2s ease-in-out loop",
-  encouraging: "animate-encouraging-4s ease-in-out loop",
-  celebrating: "animate-celebrating-3s ease-out loop",
-  supportive: "animate-supportive-5s ease-in-out loop",
-  reinforcing: "animate-reinforcing-4s ease-in-out loop",
-  challenge: "animate-challenge-3s ease-in-out loop",
-};
-
 export function NomiMascot({
   state = "neutral",
   size = 48,
@@ -28,8 +17,6 @@ export function NomiMascot({
   size?: number;
   className?: string;
 }) {
-  const animationClass = stateClasses[state as NomiMascotState] || "";
-
   return (
     <svg
       width={size}
@@ -41,8 +28,7 @@ export function NomiMascot({
         bg-nomi-surface
         border border-nomi-border/50
         text-nomi-purple-600
-        ${animationClass}
-        ${className}
+        ${className ?? ""}
       `}
       aria-hidden="true"
       data-state={state as NomiMascotState}

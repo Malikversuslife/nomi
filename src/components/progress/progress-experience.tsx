@@ -9,13 +9,10 @@ import { TopicProgress } from "./topic-progress";
 export function ProgressExperience({ data }: { data: ProgressExperienceData }) {
   const header = (
     <header>
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">
-        Your progress
-      </p>
-      <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-nomi-ink">
+      <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-nomi-ink sm:text-5xl">
         See how you&apos;re growing
       </h1>
-      <p className="mt-2 text-nomi-muted">
+      <p className="mt-2 text-sm text-nomi-muted">
         Track what you&apos;ve been practising and see where to focus next.
       </p>
     </header>
@@ -25,11 +22,11 @@ export function ProgressExperience({ data }: { data: ProgressExperienceData }) {
     return (
       <div className="space-y-6">
         {header}
-        <section className="mx-auto max-w-[640px] rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-6 text-center shadow-sm">
+        <section className="py-6 text-center">
           <h2 className="font-display text-2xl font-bold tracking-[-0.03em] text-nomi-ink">
             Learning content isn&apos;t ready yet
           </h2>
-          <p className="mt-2 text-sm text-nomi-muted">
+          <p className="mx-auto mt-2 max-w-sm text-sm text-nomi-muted">
             Your progress will appear here as soon as topics become available.
           </p>
         </section>

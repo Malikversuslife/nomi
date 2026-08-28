@@ -1,15 +1,7 @@
-import { Atom, BookOpen, Calculator, FlaskConical, Leaf } from "lucide-react";
-import type { ComponentType } from "react";
 import type { SubjectProgressView } from "@/domain/progress/types";
-
-type IconComponent = ComponentType<{ className?: string }>;
-
-const subjectIcons: Record<string, IconComponent> = {
-  calculator: Calculator,
-  atom: Atom,
-  flask: FlaskConical,
-  leaf: Leaf,
-};
+import { SectionHeader } from "@/components/ui/section-header";
+import { SubjectIcon } from "@/components/ui/subject-icon";
+import { subjectIdentityForIconKey } from "@/components/ui/subject-identity";
 
 function subjectSummarySegments(subject: SubjectProgressView): {
   id: string;
@@ -26,12 +18,12 @@ function subjectSummarySegments(subject: SubjectProgressView): {
     });
   }
   if (subject.strong > 0) {
-    segments.push({ id: "strong", dotClass: "bg-nomi-mint-500", text: `${subject.strong} strong` });
+    segments.push({ id: "strong", dotClass: "bg-nomi-success-500", text: `${subject.strong} strong` });
   }
   if (subject.needsPractice > 0) {
     segments.push({
       id: "needs-practice",
-      dotClass: "bg-nomi-yellow-500",
+      dotClass: "bg-nomi-warning-500",
       text: `${subject.needsPractice} ${subject.needsPractice === 1 ? "topic needs practice" : "topics need practice"}`,
     });
   }
@@ -40,17 +32,21 @@ function subjectSummarySegments(subject: SubjectProgressView): {
 }
 
 function SubjectCard({ subject }: { subject: SubjectProgressView }) {
-  const Icon = subjectIcons[subject.iconKey ?? ""] ?? BookOpen;
   const segments = subjectSummarySegments(subject);
+  const identity = subjectIdentityForIconKey(subject.iconKey);
 
   return (
-    <li className="rounded-[var(--nomi-radius-large)] border border-nomi-border bg-white/70 p-4 shadow-sm sm:p-5">
+    <li
+      className="rounded-[var(--nomi-radius-large)] p-4 sm:p-5"
+      style={{ backgroundColor: identity.soft }}
+    >
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-nomi-purple-100 text-nomi-purple-700"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-nomi-surface/70"
+          style={{ color: identity.color }}
         >
-          <Icon className="h-5 w-5" />
+          <SubjectIcon iconKey={subject.iconKey} size={20} strokeWidth={2} />
         </span>
         <div className="min-w-0">
           <h3 className="font-display text-lg font-bold tracking-[-0.01em] text-nomi-ink">
@@ -90,15 +86,7 @@ function SubjectCard({ subject }: { subject: SubjectProgressView }) {
 export function SubjectProgress({ subjects }: { subjects: SubjectProgressView[] }) {
   return (
     <section aria-labelledby="progress-subjects-heading">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
-        Your subjects
-      </p>
-      <h2
-        id="progress-subjects-heading"
-        className="mt-1 font-display text-2xl font-bold tracking-[-0.03em] text-nomi-ink"
-      >
-        Your subjects
-      </h2>
+      <SectionHeader id="progress-subjects-heading" title="Your subjects" />
 
       {subjects.length === 0 ? (
         <p className="mt-3 text-sm text-nomi-muted">

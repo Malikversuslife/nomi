@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
 import { sendTutorMessageAction } from "@/server/tutor/actions";
 import type { TutorInitialData, TutorMessageView } from "@/domain/tutor/types";
 import { tutorContextChip } from "@/domain/tutor/context";
+import { ContextChip } from "@/components/ui/context-chip";
 import { TutorComposer } from "./tutor-composer";
 import { TutorEmptyState } from "./tutor-empty-state";
 import { TutorError } from "./tutor-error";
@@ -86,22 +86,16 @@ export function TutorExperience({ initialData }: { initialData: TutorInitialData
 
   return (
     <div className="mx-auto w-full max-w-[760px]">
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-2 sm:mb-5">
+      <header className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">
-            Nomi
-          </p>
           <h1 className="font-display text-3xl font-bold tracking-[-0.04em] text-nomi-ink sm:text-4xl">
             Learn with Nomi
           </h1>
-          <p className="mt-1 text-sm text-nomi-muted">Ask about what you&apos;re learning.</p>
+          <p className="mt-1 text-sm text-nomi-muted">
+            Ask about what you&apos;re learning.
+          </p>
         </div>
-        {chip ? (
-          <span className="inline-flex min-h-9 items-center gap-1.5 rounded-[var(--nomi-radius-pill)] border border-nomi-purple-100 bg-nomi-purple-100/60 px-3 text-xs font-semibold text-nomi-purple-700">
-            <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
-            <span className="whitespace-nowrap">{chip}</span>
-          </span>
-        ) : null}
+        {chip ? <ContextChip>{chip}</ContextChip> : null}
       </header>
 
       {!started ? (

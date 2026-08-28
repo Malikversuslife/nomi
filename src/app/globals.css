@@ -5,7 +5,9 @@
   --color-nomi-purple-700: var(--nomi-purple-700);
   --color-nomi-purple-600: var(--nomi-purple-600);
   --color-nomi-purple-500: var(--nomi-purple-500);
+  --color-nomi-purple-200: var(--nomi-purple-200);
   --color-nomi-purple-100: var(--nomi-purple-100);
+  --color-nomi-purple-50: var(--nomi-purple-50);
   --color-nomi-mint-500: var(--nomi-mint-500);
   --color-nomi-mint-100: var(--nomi-mint-100);
   --color-nomi-yellow-500: var(--nomi-yellow-500);
@@ -17,6 +19,43 @@
   --color-nomi-surface: var(--nomi-surface);
   --color-nomi-background: var(--nomi-background);
   --color-nomi-border: var(--nomi-border);
+
+  --color-nomi-on-primary: var(--nomi-on-primary);
+  --color-nomi-surface-subtle: var(--nomi-surface-subtle);
+  --color-nomi-surface-raised: var(--nomi-surface-raised);
+  --color-nomi-border-subtle: var(--nomi-border-subtle);
+  --color-nomi-border-strong: var(--nomi-border-strong);
+
+  --color-nomi-disabled-bg: var(--nomi-disabled-bg);
+  --color-nomi-disabled-text: var(--nomi-disabled-text);
+
+  --color-nomi-success-500: var(--nomi-success-500);
+  --color-nomi-success-100: var(--nomi-success-100);
+  --color-nomi-warning-500: var(--nomi-warning-500);
+  --color-nomi-warning-100: var(--nomi-warning-100);
+  --color-nomi-error-500: var(--nomi-error-500);
+  --color-nomi-error-100: var(--nomi-error-100);
+  --color-nomi-info-500: var(--nomi-info-500);
+  --color-nomi-info-100: var(--nomi-info-100);
+
+  --color-nomi-math: var(--nomi-math);
+  --color-nomi-math-soft: var(--nomi-math-soft);
+  --color-nomi-physics: var(--nomi-physics);
+  --color-nomi-physics-soft: var(--nomi-physics-soft);
+  --color-nomi-chemistry: var(--nomi-chemistry);
+  --color-nomi-chemistry-soft: var(--nomi-chemistry-soft);
+  --color-nomi-biology: var(--nomi-biology);
+  --color-nomi-biology-soft: var(--nomi-biology-soft);
+
+  --color-nomi-brand-primary: var(--nomi-brand-primary);
+  --color-nomi-brand-strong: var(--nomi-brand-strong);
+  --color-nomi-brand-soft: var(--nomi-brand-soft);
+  --color-nomi-brand-softer: var(--nomi-brand-softer);
+  --color-nomi-selected-bg: var(--nomi-selected-bg);
+  --color-nomi-canvas: var(--nomi-canvas);
+  --color-nomi-text-primary: var(--nomi-text-primary);
+  --color-nomi-text-secondary: var(--nomi-text-secondary);
+
   --font-display: var(--font-bricolage);
   --font-sans: var(--font-inter);
 }
@@ -27,26 +66,16 @@
 
 html {
   min-height: 100%;
-  background: var(--nomi-background);
+  background: var(--nomi-canvas);
   color: var(--nomi-ink);
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--nomi-background);
+  background: var(--nomi-canvas);
   color: var(--nomi-ink);
   font-family: var(--font-inter), system-ui, sans-serif;
-}
-
-body::before {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background:
-    radial-gradient(circle at top left, rgb(238 230 251 / 72%), transparent 34rem),
-    var(--nomi-background);
 }
 
 a {
@@ -62,7 +91,7 @@ select {
 }
 
 :focus-visible {
-  outline: 3px solid var(--nomi-purple-500);
+  outline: 3px solid var(--nomi-purple-600);
   outline-offset: 3px;
 }
 

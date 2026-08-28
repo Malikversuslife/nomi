@@ -1,16 +1,9 @@
 "use client";
 
-import { Atom, BookOpen, Calculator, FlaskConical, Leaf } from "lucide-react";
-import type { ComponentType } from "react";
-
-type IconComponent = ComponentType<{ className?: string }>;
-
-const subjectIcons: Record<string, IconComponent> = {
-  calculator: Calculator,
-  atom: Atom,
-  flask: FlaskConical,
-  leaf: Leaf,
-};
+import { SubjectIcon } from "@/components/ui/subject-icon";
+import { Button } from "@/components/ui/button";
+import { Eyebrow } from "@/components/ui/eyebrow";
+import { subjectIdentityForIconKey } from "@/components/ui/subject-identity";
 
 export type SubjectSelectorOption = {
   slug: string;
@@ -33,35 +26,38 @@ export function SubjectSelector({
 
   return (
     <div role="group" aria-label="Choose a subject">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
-        Choose a subject
-      </p>
+      <Eyebrow className="mb-3">Choose a subject</Eyebrow>
       <div className="flex snap-x gap-2 overflow-x-auto pb-1.5 pl-1 pr-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible sm:p-0">
         {subjects.map((subject) => {
-          const Icon = subjectIcons[subject.iconKey ?? ""] ?? BookOpen;
           const isSelected = subject.slug === selected;
+          const identity = subjectIdentityForIconKey(subject.iconKey);
 
           return (
-            <button
+            <Button
               key={subject.slug}
               type="button"
               aria-pressed={isSelected}
+              size="sm"
+              variant="secondary"
               onClick={() => onSelect(subject.slug)}
-              className={`
-                inline-flex min-h-11 shrink-0 snap-start items-center gap-2 rounded-[var(--nomi-radius-pill)] border px-4 text-sm font-semibold transition-colors
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500 focus-visible:ring-offset-2
-                ${
-                  isSelected
-                    ? "border-nomi-purple-600 bg-nomi-purple-600 text-white"
-                    : "border-nomi-border bg-nomi-surface text-nomi-ink hover:border-nomi-purple-500 hover:bg-nomi-purple-100"
-                }
-              `}
+              className="shrink-0 snap-start"
+              style={
+                isSelected
+                  ? {
+                      backgroundColor: identity.soft,
+                      borderColor: identity.color,
+                    }
+                  : undefined
+              }
             >
-              <span aria-hidden="true">
-                <Icon className="h-4 w-4" />
+              <span
+                aria-hidden="true"
+                style={isSelected ? { color: identity.color } : undefined}
+              >
+                <SubjectIcon iconKey={subject.iconKey} size={15} strokeWidth={2} />
               </span>
               {subject.name}
-            </button>
+            </Button>
           );
         })}
       </div>

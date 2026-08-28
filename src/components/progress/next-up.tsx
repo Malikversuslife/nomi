@@ -1,6 +1,8 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { NomiMascot, type NomiMascotState } from "@/components/nomi/nomi-mascot";
+import { AppIcon } from "@/components/ui/app-icon";
+import { ButtonLink } from "@/components/ui/button";
+import { SectionHeader } from "@/components/ui/section-header";
 import type { NextUpView } from "@/domain/progress/types";
 
 const mascotStates: Record<NextUpView["mascotKey"], NomiMascotState> = {
@@ -13,32 +15,25 @@ export function NextUp({ view }: { view: NextUpView }) {
   return (
     <section
       aria-labelledby="progress-next-up-heading"
-      className="flex flex-col gap-4 rounded-[var(--nomi-radius-large)] border border-nomi-purple-100 bg-nomi-background p-5 shadow-sm sm:flex-row sm:items-start sm:p-6"
+      className="flex flex-col gap-4 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle p-5 sm:flex-row sm:items-start sm:p-6"
     >
       <NomiMascot state={mascotStates[view.mascotKey]} size={44} className="shrink-0" />
 
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
-          Next up
-        </p>
-        <h2
+        <SectionHeader
           id="progress-next-up-heading"
-          className="mt-1 font-display text-2xl font-bold tracking-[-0.03em] text-nomi-ink"
-        >
-          {view.topicName}
-        </h2>
+          eyebrow="Next up"
+          title={view.topicName}
+        />
         <p className="mt-1 text-sm font-medium leading-relaxed text-nomi-ink">
           {view.message}
         </p>
       </div>
 
-      <Link
-        href="/practice"
-        className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 self-start rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-nomi-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500 focus-visible:ring-offset-2"
-      >
+      <ButtonLink href="/practice" className="shrink-0 self-start">
         Practise
-        <ArrowRight aria-hidden="true" className="h-4 w-4" />
-      </Link>
+        <AppIcon icon={ArrowRight01Icon} size={16} strokeWidth={2.25} />
+      </ButtonLink>
     </section>
   );
 }

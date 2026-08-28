@@ -1,4 +1,5 @@
-import { Check } from "lucide-react";
+import { CircleCheckIcon } from "@hugeicons/core-free-icons";
+import { AppIcon } from "@/components/ui/app-icon";
 import { MathText } from "./math-text";
 
 type PracticeOption = { id: string; label: string };
@@ -31,21 +32,21 @@ export function AnswerOptions({
         const isWrongSelection = submitted && isSelected && !revealCorrect;
 
         let tileClasses =
-          "border-nomi-border bg-white hover:border-nomi-purple-500 hover:bg-nomi-purple-100/50";
+          "border-nomi-border bg-nomi-surface hover:border-nomi-purple-500 hover:bg-nomi-purple-100/50";
         let sideLabel: string | null = null;
         let showCheck = false;
 
         if (isConfirmedCorrect) {
-          tileClasses = "border-nomi-mint-500 bg-nomi-mint-100";
+          tileClasses = "border-nomi-success-500 bg-nomi-success-100";
           sideLabel = "Correct answer";
           showCheck = true;
         } else if (isWrongSelection) {
-          tileClasses = "border-nomi-pink-500 bg-nomi-pink-100";
+          tileClasses = "border-nomi-error-500 bg-nomi-error-100";
           sideLabel = "Your answer";
         } else if (isSelected) {
           tileClasses = "border-nomi-purple-500 bg-nomi-purple-100";
         } else if (submitted) {
-          tileClasses = "border-nomi-border bg-white opacity-60";
+          tileClasses = "border-nomi-border bg-nomi-surface opacity-60";
         }
 
         return (
@@ -69,7 +70,7 @@ export function AnswerOptions({
             {sideLabel && (
               <span className="flex shrink-0 items-center gap-1 text-xs font-bold uppercase tracking-wide text-nomi-ink">
                 {sideLabel}
-                {showCheck && <Check aria-hidden="true" className="h-3.5 w-3.5" />}
+                {showCheck && <AppIcon icon={CircleCheckIcon} size={14} strokeWidth={2.5} />}
               </span>
             )}
           </label>

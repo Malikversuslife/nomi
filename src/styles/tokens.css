@@ -1,8 +1,10 @@
 :root {
-  --nomi-purple-700: #6538b6;
-  --nomi-purple-600: #7748d0;
-  --nomi-purple-500: #8b5de3;
-  --nomi-purple-100: #eee6fb;
+  --nomi-purple-700: #5425ae;
+  --nomi-purple-600: #7540d8;
+  --nomi-purple-500: #a77aef;
+  --nomi-purple-200: #e4d8fa;
+  --nomi-purple-100: #ede3ff;
+  --nomi-purple-50: #f6f1ff;
 
   --nomi-mint-500: #6dd8b5;
   --nomi-mint-100: #ddf7ee;
@@ -11,21 +13,60 @@
   --nomi-yellow-100: #fff4c7;
 
   --nomi-pink-500: #ef8eb7;
-  --nomi-pink-100: #fce2ec;
+  --nomi-pink-100: #fbe2ec;
 
-  --nomi-ink: #25232b;
-  --nomi-muted: #716d79;
+  --nomi-ink: #211d27;
+  --nomi-muted: #69636f;
   --nomi-surface: #ffffff;
-  --nomi-background: #fbf9f6;
-  --nomi-border: #e9e4ec;
+  --nomi-background: #fbf8f3;
+  --nomi-border: #e5ded7;
 
-  --nomi-radius-small: 12px;
-  --nomi-radius-medium: 16px;
-  --nomi-radius-large: 24px;
+  --nomi-on-primary: #ffffff;
+  --nomi-surface-subtle: #f5f0e9;
+  --nomi-surface-raised: #ffffff;
+  --nomi-border-subtle: #efeae4;
+  --nomi-border-strong: #dacfc2;
+
+  --nomi-disabled-bg: #e7e2ea;
+  --nomi-disabled-text: #99929e;
+
+  --nomi-success-500: #177a5e;
+  --nomi-success-100: #ddf7ee;
+  --nomi-warning-500: #8a6500;
+  --nomi-warning-100: #fff4c7;
+  --nomi-error-500: #b5475f;
+  --nomi-error-100: #fde8ed;
+  --nomi-info-500: #3567c8;
+  --nomi-info-100: #eaf0ff;
+
+  --nomi-math: #4d73e6;
+  --nomi-math-soft: #eaf0ff;
+  --nomi-physics: #f29b45;
+  --nomi-physics-soft: #fff1df;
+  --nomi-chemistry: #25a99a;
+  --nomi-chemistry-soft: #dff7f3;
+  --nomi-biology: #63a653;
+  --nomi-biology-soft: #eaf6e5;
+
+  --nomi-radius-small: 10px;
+  --nomi-radius-medium: 14px;
+  --nomi-radius-large: 18px;
+  --nomi-radius-feature: 24px;
   --nomi-radius-pill: 999px;
 
   --nomi-safe-bottom: env(safe-area-inset-bottom, 0px);
   --nomi-safe-left: env(safe-area-inset-left, 0px);
   --nomi-safe-right: env(safe-area-inset-right, 0px);
   --nomi-safe-top: env(safe-area-inset-top, 0px);
+}
+
+:root {
+  --nomi-brand-primary: var(--nomi-purple-600);
+  --nomi-brand-strong: var(--nomi-purple-700);
+  --nomi-brand-soft: var(--nomi-purple-100);
+  --nomi-brand-softer: var(--nomi-purple-50);
+  --nomi-selected-bg: var(--nomi-purple-100);
+  --nomi-canvas: var(--nomi-background);
+  --nomi-text-primary: var(--nomi-ink);
+  --nomi-text-secondary: var(--nomi-muted);
 }

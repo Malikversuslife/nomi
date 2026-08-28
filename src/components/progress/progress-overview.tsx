@@ -9,12 +9,12 @@ const VISIBLE_CATEGORIES = [
   {
     key: "strong",
     label: "Strong",
-    dotClass: "bg-nomi-mint-500",
+    dotClass: "bg-nomi-success-500",
   },
   {
     key: "needsPractice",
     label: "Needs practice",
-    dotClass: "bg-nomi-yellow-500",
+    dotClass: "bg-nomi-warning-500",
   },
 ] as const;
 
@@ -33,7 +33,7 @@ export function ProgressOverview({ overview }: { overview: ProgressOverview }) {
   return (
     <section
       aria-labelledby="progress-overview-heading"
-      className="rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-5 shadow-sm sm:p-6"
+      className="rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle p-5 sm:p-6"
     >
       <h2
         id="progress-overview-heading"
@@ -45,12 +45,9 @@ export function ProgressOverview({ overview }: { overview: ProgressOverview }) {
         A simple snapshot of where you&apos;re at right now.
       </p>
 
-      <ul className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
+      <ul className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-6">
         {items.map((item) => (
-          <li
-            key={item.key}
-            className="flex items-center gap-2.5 rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-white/70 px-4 py-3 sm:min-w-[8.5rem] sm:flex-1"
-          >
+          <li key={item.key} className="flex items-center gap-2.5">
             <span
               aria-hidden="true"
               className={`h-2.5 w-2.5 shrink-0 rounded-full ${item.dotClass}`}

@@ -1,11 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import Link from "next/link";
 import { NomiMascot } from "@/components/nomi/nomi-mascot";
 import { submitPracticeAttemptAction } from "@/server/practice/actions";
 import type { PracticeActionState } from "@/server/practice/types";
 import type { LearnerSafePracticeQuestionWithMeta } from "@/server/practice/questions";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { FeedbackBanner } from "@/components/ui/feedback-banner";
 import { AnswerOptions } from "./answer-options";
 import { HintPanel } from "./hint-panel";
 import { ErrorPanel } from "./error-panel";
@@ -53,29 +54,21 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
   if (!question) {
     const wrappedUp = answeredCount > 0;
     return (
-      <section className="mx-auto flex max-w-[640px] flex-col items-center gap-4 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface px-6 py-10 text-center shadow-sm">
+      <section className="mx-auto flex max-w-[560px] flex-col items-center gap-4 px-2 py-8 text-center">
         <NomiMascot state={wrappedUp ? "celebrating" : "curious"} size={56} />
         <h1 className="font-display text-2xl font-bold text-nomi-ink">
           {wrappedUp ? "Practice is all wrapped up." : "No practice questions right now."}
         </h1>
-        <p className="max-w-sm text-sm text-nomi-muted">
+        <p className="max-w-sm text-sm leading-relaxed text-nomi-muted">
           {wrappedUp
             ? "You've made it through today's practice session. Nomi will have more questions ready soon."
             : "Nomi doesn't have questions ready for this topic yet. Check back soon."}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Link
-            className="min-h-11 rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-nomi-purple-700"
-            href="/home"
-          >
-            Back to home
-          </Link>
-          <Link
-            className="min-h-11 rounded-[var(--nomi-radius-pill)] border border-nomi-border bg-white px-6 text-sm font-semibold text-nomi-ink transition-colors hover:bg-nomi-purple-100"
-            href="/learn"
-          >
+          <ButtonLink href="/home">Back to home</ButtonLink>
+          <ButtonLink href="/learn" variant="secondary">
             Explore lessons
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     );
@@ -124,15 +117,15 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
 
       <form
         action={formAction}
-        className="overflow-hidden rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface shadow-sm"
+        className="space-y-6"
         onSubmit={() => setSubmittedForQuestionId(question.id)}
       >
         <input name="questionId" type="hidden" value={question.id} />
         <input name="questionType" type="hidden" value={question.questionType} />
         <input name="submissionKey" type="hidden" value={submissionKey} />
 
-        <div className="space-y-6 p-5 sm:p-6">
-          <h2 className="font-display text-2xl font-bold leading-snug text-nomi-ink">
+        <div className="space-y-6">
+          <h2 className="font-display text-2xl font-bold leading-snug tracking-[-0.02em] text-nomi-ink sm:text-[1.7rem]">
             <MathText text={question.prompt} />
           </h2>
 
@@ -150,11 +143,11 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
               <span className="text-sm font-semibold text-nomi-ink">Your answer</span>
               <input
                 autoComplete="off"
-                className={`min-h-12 w-full rounded-[var(--nomi-radius-medium)] border bg-white px-4 text-sm text-nomi-ink placeholder:text-nomi-muted ${
+                className={`min-h-12 w-full rounded-[var(--nomi-radius-medium)] border bg-nomi-surface px-4 text-sm text-nomi-ink placeholder:text-nomi-muted ${
                   submitted
                     ? state.result?.correct
-                      ? "border-nomi-mint-500"
-                      : "border-nomi-pink-500"
+                      ? "border-nomi-success-500"
+                      : "border-nomi-error-500"
                     : "border-nomi-border focus:border-nomi-purple-500"
                 }`}
                 disabled={!interactive}
@@ -176,24 +169,20 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
           )}
 
           {persistedGuidance && !submitted && (
-            <div className="rounded-[var(--nomi-radius-medium)] border border-nomi-purple-100 bg-nomi-purple-100/40 p-4">
-              <h3 className="text-sm font-bold uppercase tracking-wide text-nomi-purple-700">
-                {guidanceHeading[persistedGuidance.kind]}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-nomi-ink">
-                <MathText text={persistedGuidance.text} />
-              </p>
-            </div>
+            <FeedbackBanner variant="info" title={guidanceHeading[persistedGuidance.kind]}>
+              <MathText text={persistedGuidance.text} />
+            </FeedbackBanner>
           )}
 
           {!submitted && !failed && (
-            <button
-              className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-nomi-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
+            <Button
+              size="lg"
+              className="w-full"
               disabled={!canSubmit}
               type="submit"
             >
               {isPending ? "Checking…" : "Check answer"}
-            </button>
+            </Button>
           )}
         </div>
       </form>

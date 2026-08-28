@@ -17,11 +17,12 @@ export function LearnExperience({ data }: { data: LearnExperienceData }) {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-nomi-purple-600">
-          Explore your path
+        <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-nomi-ink sm:text-5xl">
+          Learn
+        </h1>
+        <p className="mt-2 text-sm text-nomi-muted">
+          Choose a subject and keep building your path.
         </p>
-        <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-nomi-ink">Learn</h1>
-        <p className="mt-2 text-nomi-muted">Choose a subject and keep building your path.</p>
       </header>
 
       <LearnContinueCard view={data.continueView} />

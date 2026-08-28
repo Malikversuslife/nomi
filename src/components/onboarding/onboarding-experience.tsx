@@ -1,9 +1,14 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import type { ComponentType } from "react";
-import { Atom, BookOpen, Calculator, Check, FlaskConical, Leaf } from "lucide-react";
+import { CircleCheckIcon } from "@hugeicons/core-free-icons";
+import { AppIcon } from "@/components/ui/app-icon";
 import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { SubjectIcon } from "@/components/ui/subject-icon";
+import { SubjectVisual } from "@/components/ui/subject-visual";
+import { subjectIdentityForName, subjectIdentityForIconKey } from "@/components/ui/subject-identity";
+import { Button } from "@/components/ui/button";
+import { FeedbackBanner } from "@/components/ui/feedback-banner";
 import type {
   OnboardingCompleteActionState,
   OnboardingExperienceData,
@@ -14,21 +19,6 @@ type OnboardingCompleteAction = (
   prevState: OnboardingCompleteActionState,
   formData: FormData,
 ) => Promise<OnboardingCompleteActionState>;
-
-type IconComponent = ComponentType<{ className?: string }>;
-
-const subjectIcons: Record<string, IconComponent> = {
-  calculator: Calculator,
-  atom: Atom,
-  flask: FlaskConical,
-  leaf: Leaf,
-};
-
-const primaryButtonClasses =
-  "inline-flex min-h-11 items-center justify-center rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-nomi-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
-
-const secondaryButtonClasses =
-  "inline-flex min-h-11 items-center justify-center rounded-[var(--nomi-radius-pill)] border border-nomi-border bg-nomi-surface px-6 text-sm font-semibold text-nomi-ink transition-colors hover:border-nomi-purple-500 hover:bg-nomi-purple-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500 focus-visible:ring-offset-2";
 
 export function OnboardingExperience({
   data,
@@ -99,9 +89,9 @@ function ProgressCue({ current, total }: { current: number; total: number }) {
 
 function BackButton({ onBack }: { onBack: () => void }) {
   return (
-    <button type="button" onClick={onBack} aria-label="Go back" className={secondaryButtonClasses}>
+    <Button type="button" variant="secondary" onClick={onBack} aria-label="Go back">
       Back
-    </button>
+    </Button>
   );
 }
 
@@ -132,9 +122,9 @@ function WelcomeStep({
       {displayName ? (
         <p className="mt-1 text-sm text-nomi-muted">Hi, {displayName}.</p>
       ) : null}
-      <button type="button" onClick={onNext} className={`${primaryButtonClasses} mt-8`}>
+      <Button type="button" className="mt-8 px-6" onClick={onNext}>
         Get started
-      </button>
+      </Button>
     </section>
   );
 }
@@ -173,7 +163,7 @@ function SubjectStep({
       <div
         role="radiogroup"
         aria-label="Choose a subject"
-        className="mt-6 flex flex-col gap-3 text-left"
+        className="mt-6 grid gap-3 text-left sm:grid-cols-2"
       >
         {subjects.map((subject) => (
           <SubjectOption
@@ -187,14 +177,9 @@ function SubjectStep({
 
       <div className="mt-6 flex items-center justify-center gap-3">
         <BackButton onBack={onBack} />
-        <button
-          type="button"
-          onClick={onContinue}
-          disabled={!selectedSlug}
-          className={primaryButtonClasses}
-        >
+        <Button type="button" className="px-6" disabled={!selectedSlug} onClick={onContinue}>
           Continue
-        </button>
+        </Button>
       </div>
     </section>
   );
@@ -209,7 +194,7 @@ function SubjectOption({
   selected: boolean;
   onSelect: (slug: string) => void;
 }) {
-  const Icon = subjectIcons[subject.iconKey ?? ""] ?? BookOpen;
+  const identity = subjectIdentityForIconKey(subject.iconKey);
 
   return (
     <label
@@ -231,8 +216,8 @@ function SubjectOption({
         onChange={() => onSelect(subject.slug)}
         className="sr-only"
       />
-      <span aria-hidden="true" className="shrink-0">
-        <Icon className="h-6 w-6 text-nomi-purple-600" />
+      <span aria-hidden="true" className="shrink-0" style={{ color: identity.color }}>
+        <SubjectIcon iconKey={subject.iconKey} className="h-6 w-6" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-semibold text-nomi-ink">{subject.name}</span>
@@ -242,7 +227,7 @@ function SubjectOption({
       </span>
       {selected ? (
         <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-nomi-purple-700">
-          <Check className="h-4 w-4" aria-hidden="true" />
+          <AppIcon icon={CircleCheckIcon} size={15} strokeWidth={2.5} />
           Selected
         </span>
       ) : (
@@ -271,6 +256,7 @@ function ReadyStep({
   onBack: () => void;
 }) {
   const topic = subject.startingTopic;
+  const identity = subjectIdentityForName(subject.name);
 
   return (
     <section className="mx-auto w-full max-w-md text-center">
@@ -291,15 +277,27 @@ function ReadyStep({
       </p>
 
       {topic ? (
-        <div className="mt-6 rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface p-4 text-left shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-nomi-muted">
-            Starting point
-          </p>
-          <ol className="mt-2 list-none space-y-0.5 text-nomi-ink">
-            <li>{topic.unitName}</li>
-            {topic.groupName ? <li>{topic.groupName}</li> : null}
-            <li className="font-semibold text-nomi-purple-700">{topic.topicName}</li>
-          </ol>
+        <div
+          className="mt-6 flex items-start gap-4 rounded-[var(--nomi-radius-large)] p-4 text-left"
+          style={{ backgroundColor: identity.soft }}
+        >
+          <SubjectVisual
+            subject={subject.name}
+            size="sm"
+            className="hidden shrink-0 sm:block"
+          />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-nomi-muted">
+              Starting point
+            </p>
+            <ol className="mt-2 list-none space-y-0.5 text-sm text-nomi-ink">
+              <li>{topic.unitName}</li>
+              {topic.groupName ? <li>{topic.groupName}</li> : null}
+              <li className="font-semibold" style={{ color: identity.color }}>
+                {topic.topicName}
+              </li>
+            </ol>
+          </div>
         </div>
       ) : (
         <p className="mt-6 text-sm text-nomi-muted">
@@ -311,40 +309,43 @@ function ReadyStep({
         <input type="hidden" name="subjectSlug" value={subject.slug} readOnly />
 
         {saveError ? (
-          <p
-            role="alert"
-            className="rounded-[var(--nomi-radius-small)] bg-nomi-pink-100 px-4 py-3 text-sm text-nomi-ink"
-          >
-            {saveError}{" "}
-            <button
-              type="button"
-              onClick={() => formRef.current?.requestSubmit()}
-              className="font-semibold text-nomi-purple-700 underline underline-offset-2"
-            >
-              Try again
-            </button>
-          </p>
+          <div className="text-left">
+            <FeedbackBanner
+              variant="error"
+              title={saveError}
+              action={
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => formRef.current?.requestSubmit()}
+                >
+                  Try again
+                </Button>
+              }
+            />
+          </div>
         ) : null}
 
         <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center">
-          <button
+          <Button
             type="submit"
             name="destination"
             value="practice"
             disabled={isPending}
-            className={primaryButtonClasses}
+            className="px-6"
           >
             Start practising
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             name="destination"
             value="learn"
+            variant="secondary"
             disabled={isPending}
-            className={secondaryButtonClasses}
+            className="px-6"
           >
             Explore the subject
-          </button>
+          </Button>
         </div>
       </form>
 

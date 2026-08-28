@@ -1,6 +1,8 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
+import { ArrowUp01Icon } from "@hugeicons/core-free-icons";
+import { AppIcon } from "@/components/ui/app-icon";
+import { IconButton } from "@/components/ui/icon-button";
 
 export function TutorComposer({
   value,
@@ -17,7 +19,7 @@ export function TutorComposer({
 
   return (
     <form
-      className="flex items-end gap-2 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-2 shadow-sm"
+      className="flex items-end gap-2 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-2 shadow-[0_10px_32px_-12px_rgba(33,29,39,0.28)]"
       onSubmit={(event) => {
         event.preventDefault();
         if (canSend) {
@@ -45,14 +47,14 @@ export function TutorComposer({
           className="block max-h-40 min-h-11 w-full resize-y rounded-[var(--nomi-radius-medium)] border border-transparent bg-transparent p-2 text-sm leading-relaxed text-nomi-ink placeholder:text-nomi-muted focus:border-nomi-purple-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
         />
       </label>
-      <button
+      <IconButton
         type="submit"
+        variant="primary"
         disabled={!canSend}
         aria-label="Send message"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-nomi-purple-600 text-white transition-colors hover:bg-nomi-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <ArrowUp aria-hidden="true" className="h-5 w-5" />
-      </button>
+        <AppIcon icon={ArrowUp01Icon} size={20} strokeWidth={2} />
+      </IconButton>
     </form>
   );
 }

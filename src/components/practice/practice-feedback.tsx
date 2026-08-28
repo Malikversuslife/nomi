@@ -1,4 +1,5 @@
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { ArrowRight01Icon, RefreshCwIcon } from "@hugeicons/core-free-icons";
+import { AppIcon } from "@/components/ui/app-icon";
 import { MathText } from "./math-text";
 import {
   feedbackCopy,
@@ -7,6 +8,8 @@ import {
   reactionForResult,
 } from "./feedback";
 import { NomiReaction } from "./nomi-reaction";
+import { Button } from "@/components/ui/button";
+import { FeedbackBanner } from "@/components/ui/feedback-banner";
 
 export type FeedbackResult = {
   correct: boolean;
@@ -32,7 +35,7 @@ export function PracticeFeedback({
   return (
     <section
       aria-live="polite"
-      className="space-y-4 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-5 shadow-sm"
+      className="space-y-4 rounded-[var(--nomi-radius-feature)] bg-nomi-surface-subtle p-5 sm:p-6"
     >
       <div className="flex items-center justify-between gap-4">
         <div>
@@ -43,35 +46,22 @@ export function PracticeFeedback({
       </div>
 
       {guidance && (
-        <div className="rounded-[var(--nomi-radius-medium)] border border-nomi-purple-100 bg-nomi-purple-100/40 p-4">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-nomi-purple-700">
-            {guidanceHeading[guidance.kind]}
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed text-nomi-ink">
-            <MathText text={guidance.text} />
-          </p>
-        </div>
+        <FeedbackBanner variant="info" title={guidanceHeading[guidance.kind]}>
+          <MathText text={guidance.text} />
+        </FeedbackBanner>
       )}
 
       <div className="pt-1">
         {result.correct ? (
-          <button
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-nomi-purple-700"
-            onClick={onContinue}
-            type="button"
-          >
+          <Button size="lg" className="w-full" onClick={onContinue} type="button">
             Continue
-            <ArrowRight aria-hidden="true" className="h-4 w-4" />
-          </button>
+            <AppIcon icon={ArrowRight01Icon} size={16} strokeWidth={2.25} />
+          </Button>
         ) : (
-          <button
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-6 text-sm font-semibold text-white transition-colors hover:bg-nomi-purple-700"
-            onClick={onRetry}
-            type="button"
-          >
-            <RefreshCw aria-hidden="true" className="h-4 w-4" />
+          <Button size="lg" className="w-full" onClick={onRetry} type="button">
+            <AppIcon icon={RefreshCwIcon} size={16} strokeWidth={2.25} />
             Try again
-          </button>
+          </Button>
         )}
       </div>
     </section>

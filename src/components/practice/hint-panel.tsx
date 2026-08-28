@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown, Lightbulb } from "lucide-react";
+import { ChevronDownIcon, LightbulbIcon } from "@hugeicons/core-free-icons";
+import { AppIcon } from "@/components/ui/app-icon";
 import { MathText } from "./math-text";
 
 export function HintPanel({
@@ -16,7 +17,7 @@ export function HintPanel({
   }
 
   return (
-    <div className="rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface p-4">
+    <div className="rounded-[var(--nomi-radius-medium)] border border-nomi-border-subtle bg-nomi-surface-subtle p-4">
       <button
         aria-controls="practice-hint-content"
         aria-expanded={open}
@@ -25,11 +26,13 @@ export function HintPanel({
         onClick={() => setOpen((value) => !value)}
         type="button"
       >
-        <Lightbulb aria-hidden="true" className="h-4 w-4" />
+        <AppIcon icon={LightbulbIcon} size={16} strokeWidth={2} />
         {open ? "Hide hint" : "Need a hint?"}
-        <ChevronDown
-          aria-hidden="true"
-          className={`ml-1 h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
+        <AppIcon
+          icon={ChevronDownIcon}
+          className={`ml-1 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          size={16}
+          strokeWidth={2}
         />
       </button>
       {open && (

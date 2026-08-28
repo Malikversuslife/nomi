@@ -22,8 +22,8 @@ export function AuthForm({ mode, action }: AuthFormProps) {
           <label className="text-sm font-semibold text-nomi-ink" htmlFor="displayName">
             Preferred name
           </label>
-          <input className="min-h-12 w-full rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-white px-4 text-nomi-ink" id="displayName" name="displayName" autoComplete="name" required />
-          {state.fieldErrors?.displayName ? <p className="text-sm text-red-700">{state.fieldErrors.displayName[0]}</p> : null}
+          <input className="min-h-12 w-full rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface-subtle px-4 text-nomi-ink placeholder:text-nomi-muted focus:border-nomi-purple-500 focus:outline-none" id="displayName" name="displayName" autoComplete="name" required />
+          {state.fieldErrors?.displayName ? <p className="text-sm text-nomi-error-500">{state.fieldErrors.displayName[0]}</p> : null}
         </div>
       ) : null}
 
@@ -31,21 +31,21 @@ export function AuthForm({ mode, action }: AuthFormProps) {
         <label className="text-sm font-semibold text-nomi-ink" htmlFor="email">
           Email
         </label>
-        <input className="min-h-12 w-full rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-white px-4 text-nomi-ink" id="email" name="email" type="email" autoComplete="email" required />
-        {state.fieldErrors?.email ? <p className="text-sm text-red-700">{state.fieldErrors.email[0]}</p> : null}
+        <input className="min-h-12 w-full rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface-subtle px-4 text-nomi-ink placeholder:text-nomi-muted focus:border-nomi-purple-500 focus:outline-none" id="email" name="email" type="email" autoComplete="email" required />
+        {state.fieldErrors?.email ? <p className="text-sm text-nomi-error-500">{state.fieldErrors.email[0]}</p> : null}
       </div>
 
       <div className="space-y-2">
         <label className="text-sm font-semibold text-nomi-ink" htmlFor="password">
           Password
         </label>
-        <input className="min-h-12 w-full rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-white px-4 text-nomi-ink" id="password" name="password" type="password" autoComplete={isSignUp ? "new-password" : "current-password"} required />
-        {state.fieldErrors?.password ? <p className="text-sm text-red-700">{state.fieldErrors.password[0]}</p> : null}
+        <input className="min-h-12 w-full rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface-subtle px-4 text-nomi-ink placeholder:text-nomi-muted focus:border-nomi-purple-500 focus:outline-none" id="password" name="password" type="password" autoComplete={isSignUp ? "new-password" : "current-password"} required />
+        {state.fieldErrors?.password ? <p className="text-sm text-nomi-error-500">{state.fieldErrors.password[0]}</p> : null}
       </div>
 
-      {state.message ? <p className="rounded-[var(--nomi-radius-medium)] bg-nomi-yellow-100 px-4 py-3 text-sm text-nomi-ink">{state.message}</p> : null}
+      {state.message ? <p className="rounded-[var(--nomi-radius-medium)] bg-nomi-warning-100 px-4 py-3 text-sm text-nomi-warning-700">{state.message}</p> : null}
 
-      <button className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70" type="submit" disabled={pending}>
+      <button className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-white shadow-sm transition-colors hover:bg-nomi-purple-700 disabled:cursor-not-allowed disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text" type="submit" disabled={pending}>
         {pending ? "Working..." : isSignUp ? "Create account" : "Sign in"}
       </button>
 
