@@ -6,6 +6,7 @@ import { ContinueLearningCard } from "@/components/learn/continue-learning-card"
 import { NomiRecommendation } from "@/components/nomi/nomi-recommendation";
 import { SubjectCard } from "@/components/curriculum/subject-card";
 import { RecentLearning } from "@/components/learner/recent-learning";
+import { deriveHomeViews } from "@/domain/home/presentation";
 import { hasSupabaseConfig } from "@/server/env";
 import { getSubjectsWithTopicHierarchy } from "@/server/data/curriculum";
 import { getLearnerSubjects, getProfile, getTopicProgress } from "@/server/data/learner";
@@ -45,69 +46,8 @@ export default async function HomeRoutePage() {
     }
   }
 
-  // Derive recent topic names from progress records
-  // $ExpectedError: Supabase topicProgress type has SelectQueryError for 'topics',
-  // so we cast to access the runtime shape where topics is an array of {topic_name}.
-  const topicNames: string[] = [];
-  if (Array.isArray(topicProgress)) {
-    for (const record of topicProgress) {
-      const topics = (record as Record<string, unknown>).topics;
-      if (Array.isArray(topics)) {
-        for (const t of topics) {
-          const name = (t as { topic_name?: string }).topic_name;
-          if (name && !topicNames.includes(name)) {
-            topicNames.push(name);
-          }
-        }
-      }
-    }
-  }
-
-  // Adaptive recommendation from topic progress
-  let intervention:
-    | "continue"
-    | "reinforce"
-    | "simplify"
-    | "worked_example"
-    | "hint"
-    | "retry"
-    | "increase_challenge"
-    | "review_prerequisite" | undefined;
-  if (Array.isArray(topicProgress) && topicProgress.length > 0) {
-    const recent = topicProgress[0];
-    if (
-      recent?.topics &&
-      Array.isArray(recent.topics) &&
-      recent.topics.length > 0
-    ) {
-      const statuses = recent.topics.map((t: { status: string }) => t.status);
-      const hasRecurring = statuses.includes("recurring");
-      const hasNeedsPractice = statuses.includes("needs practice");
-      const strongCount = statuses.filter((s: string) => s === "strong").length;
-      if (hasRecurring || hasNeedsPractice) {
-        intervention = "review_prerequisite";
-      } else if (strongCount > 0) {
-        intervention = "continue";
-      }
-    }
-  }
-
-  // Build recent learning records (no UUIDs)
-  const recentLearningRecords: Array<{ topic: string; lastPractised: string }> = [];
-  if (Array.isArray(topicProgress)) {
-    for (const record of topicProgress) {
-      const topics = (record as Record<string, unknown>).topics;
-      if (Array.isArray(topics) && topics.length > 0) {
-        const first = topics[0] as { topic_name?: string };
-        if (first.topic_name) {
-          recentLearningRecords.push({
-            topic: first.topic_name,
-            lastPractised: new Date().toLocaleDateString(),
-          });
-        }
-      }
-    }
-  }
+  // Truthful home views: real topic names and persisted practice timestamps.
+  const home = deriveHomeViews(topicProgress, new Date());
 
   return (
     <FoundationShell active="Home">
@@ -115,18 +55,23 @@ export default async function HomeRoutePage() {
 
       <ContinueLearningCard
         subject={enrolledSubject}
-        currentTopic={topicNames[0]}
-        nextTopic={topicNames[1]}
+        currentTopic={home.recentTopicNames[0]}
+        nextTopic={home.recentTopicNames[1]}
       />
 
       <NomiRecommendation
-        intervention={intervention}
-        topicName={topicNames[0]}
+        intervention={home.recommendation?.intervention}
+        topicName={home.recommendation?.topicName}
       />
 
       <SubjectCard subjects={DISPLAY_SUBJECTS} activeSubject={enrolledSubject} />
 
-      <RecentLearning records={recentLearningRecords} />
+      <RecentLearning
+        records={home.recentLearning.map((record) => ({
+          topic: record.topic,
+          lastPractised: record.lastPracticedLabel,
+        }))}
+      />
     </FoundationShell>
   );
 }

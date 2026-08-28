@@ -8,7 +8,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 import { hasSupabaseConfig } from "@/server/env";
-import { SignOutButton } from "@/components/app-shell/sign-out-button";
+import { getAccountContext } from "@/server/profile/data";
+import { AccountMenu } from "@/components/account/account-menu";
 import { NomiMascot } from "@/components/nomi/nomi-mascot";
 import { AppIcon } from "@/components/ui/app-icon";
 
@@ -29,7 +30,7 @@ const mobileNavItems: NavItem[] = [
   { href: "/progress", label: "Progress", icon: ChartNoAxesColumnIncreasingIcon },
 ];
 
-export function FoundationShell({
+export async function FoundationShell({
   children,
   active,
 }: {
@@ -38,15 +39,17 @@ export function FoundationShell({
 }) {
   if (!hasSupabaseConfig()) {
     return (
-      <main className="mx-auto min-h-screen w-full max-w-md px-5 pb-[calc(4.5rem+var(--nomi-safe-bottom))] pt-[calc(1.5rem+var(--nomi-safe-top))] sm:max-w-2xl lg:max-w-5xl lg:pb-10">
+      <main className="mx-auto min-h-screen w-full max-w-md px-5 pb-[calc(5.5rem+var(--nomi-safe-bottom))] pt-[calc(1.5rem+var(--nomi-safe-top))] sm:max-w-2xl lg:max-w-5xl lg:pb-10">
         {children}
         <MobileNav active={active} />
       </main>
     );
   }
 
+  const account = await getAccountContext();
+
   return (
-    <main className="mx-auto min-h-screen w-full max-w-md px-5 pb-[calc(4.5rem+var(--nomi-safe-bottom))] pt-[calc(1.5rem+var(--nomi-safe-top))] sm:max-w-2xl lg:max-w-5xl lg:px-8 lg:pb-6 lg:pl-72 lg:pr-8">
+    <main className="mx-auto min-h-screen w-full max-w-md px-5 pb-[calc(5.5rem+var(--nomi-safe-bottom))] pt-[calc(4.5rem+var(--nomi-safe-top))] sm:max-w-2xl lg:max-w-5xl lg:px-8 lg:pb-6 lg:pl-72 lg:pr-8 lg:pt-[calc(1.5rem+var(--nomi-safe-top))]">
       {children}
 
       {/* Desktop sidebar: visible on lg+, hidden on mobile */}
@@ -90,9 +93,34 @@ export function FoundationShell({
         </nav>
 
         <div className="border-t border-nomi-border pt-4">
-          <SignOutButton />
+          <AccountMenu
+            name={account?.name ?? null}
+            email={account?.email ?? null}
+            direction="up"
+            align="start"
+          />
         </div>
       </aside>
+
+      {/* Compact mobile header: visible under lg, hidden on desktop */}
+      <header
+        className="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 border-b border-nomi-border bg-nomi-surface px-4 lg:hidden"
+        style={{ paddingTop: "var(--nomi-safe-top)" }}
+      >
+        <div className="flex min-h-14 items-center gap-2.5">
+          <NomiMascot state="neutral" size={28} />
+          <h2 className="font-display text-base font-bold tracking-[-0.03em] text-nomi-ink">
+            Nomi
+          </h2>
+        </div>
+        <AccountMenu
+          name={account?.name ?? null}
+          email={account?.email ?? null}
+          direction="down"
+          align="end"
+          compact
+        />
+      </header>
 
       <MobileNav active={active} />
     </main>
