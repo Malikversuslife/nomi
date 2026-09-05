@@ -1,25 +1,31 @@
 {
-  "name": "Nomi",
+  "name": "Nomi | Adaptive AI Learning Companion",
   "short_name": "Nomi",
-  "description": "Nomi is a mobile-first adaptive AI learning companion that learns how you learn.",
+  "description": "Nomi learns how you learn, adapting practice, guidance and support to your learning journey.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#FBF9F6",
-  "theme_color": "#FBF9F6",
+  "background_color": "#FFF9F2",
+  "theme_color": "#6C3CFF",
   "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "/icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/maskable-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]

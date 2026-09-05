@@ -38,7 +38,7 @@ export function deriveTopicState(
     return {
       key: "needs-practice",
       label: "Needs practice",
-      cue: "A few recent answers went sideways — one more go will settle the pattern.",
+      cue: "A few recent answers went sideways. One more go will settle the pattern.",
       actionLabel: "Practise again",
     };
   }
@@ -47,7 +47,7 @@ export function deriveTopicState(
     return {
       key: "strong",
       label: "Strong",
-      cue: "You're in great shape here — a quick review keeps it fresh.",
+      cue: "You're in great shape here. A quick review keeps it fresh.",
       actionLabel: "Practise",
     };
   }
@@ -57,7 +57,7 @@ export function deriveTopicState(
     label: "In progress",
     cue:
       progress.attemptedCount >= MOMENTUM_ATTEMPT_COUNT
-        ? "You're building momentum — keep it up."
+        ? "You're building momentum. Keep it up."
         : "You've made a start.",
     actionLabel: "Practise",
   };
@@ -77,7 +77,7 @@ export function insightMessageForIntervention(
     case "worked-example":
       return `Working through ${topicName} together, step by step, will help it stick.`;
     case "review-prerequisite":
-      return `${topicName} builds on an earlier idea — a quick revisit will help.`;
+      return `${topicName} builds on an earlier idea. A quick revisit will help.`;
     case "increase-challenge":
       return `You're ready for something tougher in ${topicName}.`;
     case "reinforce":

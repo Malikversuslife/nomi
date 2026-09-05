@@ -65,7 +65,7 @@ export function SettingsExperience({
           <DetailRow label="Email" value={data.email} note="Managed by your sign-in provider." />
           <DetailRow
             label="Member since"
-            value={data.memberSinceLabel ?? "—"}
+            value={data.memberSinceLabel ?? "Not available"}
           />
           <div className="flex items-center justify-between gap-4 py-3">
             <div className="min-w-0">

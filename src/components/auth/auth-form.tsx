@@ -16,7 +16,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
   const isSignUp = mode === "sign-up";
 
   return (
-    <form action={formAction} className="space-y-4 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface p-6 shadow-sm">
+    <form action={formAction} className="space-y-4">
       {isSignUp ? (
         <div className="space-y-2">
           <label className="text-sm font-semibold text-nomi-ink" htmlFor="displayName">
@@ -45,7 +45,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
 
       {state.message ? <p className="rounded-[var(--nomi-radius-medium)] bg-nomi-warning-100 px-4 py-3 text-sm text-nomi-warning-700">{state.message}</p> : null}
 
-      <button className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-white shadow-sm transition-colors hover:bg-nomi-purple-700 disabled:cursor-not-allowed disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text" type="submit" disabled={pending}>
+      <button className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-nomi-on-primary shadow-sm transition-colors hover:bg-nomi-purple-700 active:bg-nomi-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text" type="submit" disabled={pending}>
         {pending ? "Working..." : isSignUp ? "Create account" : "Sign in"}
       </button>
 

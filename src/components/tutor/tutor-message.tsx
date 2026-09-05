@@ -1,4 +1,4 @@
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { MathText } from "@/components/practice/math-text";
 import { ButtonLink } from "@/components/ui/button";
 import type { TutorMessageView } from "@/domain/tutor/types";
@@ -16,8 +16,8 @@ export function TutorMessage({ message }: { message: TutorMessageView }) {
 
   return (
     <div className="flex items-start gap-3">
-      <NomiMascot state="neutral" size={24} className="mt-1 flex-shrink-0" />
-      <div className="min-w-0 flex-1 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle p-4">
+      <NomiCharacter state="neutral" size={28} className="mt-1 flex-shrink-0" />
+      <div className="min-w-0 flex-1 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle p-4">
         <p className="whitespace-pre-line text-sm leading-relaxed text-nomi-ink">
           <MathText text={message.content} />
         </p>

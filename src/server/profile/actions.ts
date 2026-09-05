@@ -14,7 +14,7 @@ export async function updateProfileSettingsAction(
   formData: FormData,
 ): Promise<ProfileSettingsActionState> {
   if (!hasSupabaseConfig()) {
-    return { message: "Settings aren't available yet — Supabase isn't configured." };
+    return { message: "Settings aren't available yet. Supabase isn't configured." };
   }
 
   const parsed = profileSettingsSchema.safeParse({

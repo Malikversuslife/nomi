@@ -1,11 +1,11 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { NomiMascot, type NomiMascotState } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter, type NomiCharacterState } from "@/components/nomi/nomi-character";
 import { AppIcon } from "@/components/ui/app-icon";
 import { ButtonLink } from "@/components/ui/button";
 import { SectionHeader } from "@/components/ui/section-header";
 import type { NextUpView } from "@/domain/progress/types";
 
-const mascotStates: Record<NextUpView["mascotKey"], NomiMascotState> = {
+const mascotStates: Record<NextUpView["mascotKey"], NomiCharacterState> = {
   supportive: "supportive",
   encouraging: "encouraging",
   celebrating: "celebrating",
@@ -15,9 +15,9 @@ export function NextUp({ view }: { view: NextUpView }) {
   return (
     <section
       aria-labelledby="progress-next-up-heading"
-      className="flex flex-col gap-4 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle p-5 sm:flex-row sm:items-start sm:p-6"
+      className="flex flex-col gap-4 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle p-5 sm:flex-row sm:items-start sm:p-6"
     >
-      <NomiMascot state={mascotStates[view.mascotKey]} size={44} className="shrink-0" />
+      <NomiCharacter state={mascotStates[view.mascotKey]} size={48} className="shrink-0" />
 
       <div className="min-w-0 flex-1">
         <SectionHeader

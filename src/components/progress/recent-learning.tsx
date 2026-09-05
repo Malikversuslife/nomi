@@ -16,7 +16,7 @@ export function RecentLearning({ items }: { items: RecentLearningItem[] }) {
         {items.map((item) => (
           <li
             key={item.key}
-            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[var(--nomi-radius-medium)] bg-nomi-surface-subtle p-3 sm:p-3.5"
+            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface-subtle p-3 sm:p-3.5"
           >
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-nomi-ink">{item.topicName}</p>

@@ -1,15 +1,15 @@
 # Nomi Design System
 
-**Version:** 1.0  
-**Status:** Visual source of truth  
+**Version:** 1.1  
+**Status:** Implementation specification derived from the approved Nomi Brand Guide  
 **Product:** Nomi Adaptive Learning Platform  
 **Concept:** The Learning Workshop
 
 ---
 
-## 1. Purpose
+## 1. Governance and Purpose
 
-This document defines the visual language of Nomi and is the source of truth for visual implementation across Home, Learn, Practice, Nomi Tutor, Progress, Onboarding, Authentication, Navigation, and shared UI components.
+This document translates the approved Nomi Brand Guide into implementation rules for Home, Learn, Practice, Nomi Tutor, Progress, Onboarding, Authentication, Navigation, and shared UI components.
 
 Any coding agent working on Nomi must read this document before making visual changes.
 
@@ -17,11 +17,14 @@ Do not invent new colors, typography roles, icon styles, subject identities, rad
 
 This document governs **presentation**. It does not override product behavior, adaptive-learning logic, mastery or difficulty calculations, interventions, misconception lifecycle, authentication, persistence, Supabase schema/RLS, AI safety boundaries, or canonical curriculum structure.
 
-### Conflict rule
+### Source-of-truth order
 
-- Product and architecture specifications win for **behavior and data**.
-- This design system wins for **visual presentation and interaction styling**.
-- A visual refactor must not silently change working product logic.
+1. The original approved Nomi Brand Guide is the visual source of truth.
+2. Product specifications and architecture are the behavioral and information-architecture source of truth.
+3. This document is the implementation specification derived from the approved Brand Guide.
+4. Current UI is implementation, not visual authority.
+
+Future visual work must conform to the approved Brand Guide. A visual refactor must not silently change working product logic.
 
 ---
 
@@ -57,7 +60,7 @@ Nomi combines five layers:
 2. **Bold Nomi purple**
 3. **Soft subject-specific color**
 4. **Hugeicons functional iconography**
-5. **Selective isometric educational objects + Nomi mascot**
+5. **Selective soft-dimensional educational objects + Nomi companion**
 
 The visual rhythm should alternate between expressive moments and calm space:
 
@@ -69,27 +72,24 @@ Not every section should compete for attention.
 
 ## 4. Color System
 
-### 4.1 Brand colors
+### 4.1 Canonical brand colors
 
 | Token | Value | Role |
 |---|---|---|
-| Nomi Purple | `#7540D8` | Primary brand action and identity |
-| Deep Purple | `#5425AE` | Strong brand emphasis, hover/pressed where appropriate |
-| Purple Light | `#A77AEF` | Decorative/supporting brand tone |
-| Lavender | `#EDE3FF` | Selected/soft brand surfaces |
-| Lavender Soft | `#F6F1FF` | Very quiet Nomi context surfaces |
-| Ink | `#211D27` | Primary text |
-| Slate | `#69636F` | Secondary text |
-| Warm Canvas | `#FBF8F3` | Main application background |
-| Surface | `#FFFFFF` | Raised content surface |
-| Warm Surface | `#F5F0E9` | Quiet secondary surface |
-| Border | `#E5DED7` | Neutral separators/borders |
-| Disabled Background | `#E7E2EA` | Disabled controls |
-| Disabled Text | `#99929E` | Nonessential disabled labels |
+| Primary Purple | `#6C3CFF` | Primary brand action and identity |
+| Mint | `#2BD4A1` | Positive progress and companion accent |
+| Yellow | `#FFD43B` | Earned/reward accent |
+| Pink | `#FF8AAE` | Occasional delight accent |
+| Lavender | `#E9E6FF` | Soft brand surface |
+| Ink | `#111827` | Primary text |
+| Slate | `#475569` | Secondary text |
+| Stone | `#F2F2F7` | Quiet neutral surface |
+| Cream | `#FFF9F2` | Main application canvas |
+| White | `#FFFFFF` | Raised content surface |
 
 ### 4.2 Brand color rules
 
-Purple is Nomi's identity color. It should not flood the interface.
+Purple is Nomi's identity color. It should not flood the interface, but it must remain visible in high-value brand moments.
 
 Use Nomi Purple for primary CTAs, selected navigation, important Nomi moments, active controls, key focus states, and small areas of brand emphasis.
 
@@ -99,7 +99,17 @@ Use Lavender and Lavender Soft for selected backgrounds, Nomi context, quiet rec
 
 A disabled primary action must become visually neutral. Do not create a pale-purple button that looks like a weak active button.
 
-### 4.3 Subject identity
+### 4.3 Controlled gradients and derived tones
+
+Controlled purple gradients are allowed for brand moments, hero surfaces, onboarding, meaningful celebration, companion illustration backgrounds, and selected high-value feature moments.
+
+Gradients are not decoration for every CTA, card, navigation state, or arbitrary AI aesthetic. Neon gradients, glassmorphism, glossy 3D, heavy shadows, and visual noise remain prohibited.
+
+Canonical colors remain unmodified. Derived accessible tones may be used where contrast requires them: Purple Dark `#4C1DCC`, Mint Dark `#004D3A`, Yellow Dark `#7A4A00`, and Pink Dark `#A32655`. Document their use as accessibility or controlled-depth support, not new primary brand colors.
+
+Accessibility checks: White on Primary Purple is 5.63:1, Slate on Cream is 7.25:1, and Ink on Cream is 16.97:1. The derived dark tones exceed 7:1 against White. Mint, Yellow, Pink, and Lavender are accent/surface colors, not White-text backgrounds; pair them with Ink or their documented dark tone when text is required.
+
+### 4.4 Subject identity
 
 | Subject | Strong | Soft |
 |---|---|---|
@@ -112,7 +122,7 @@ Subject colors are for subject icons, subject tiles, subject hero details, small
 
 Subject colors are **not** for global navigation, generic buttons, error/success states, or random decorative accents.
 
-### 4.4 Semantic colors
+### 4.5 Semantic colors
 
 | Role | Strong | Soft |
 |---|---|---|
@@ -130,7 +140,7 @@ Rules:
 - Verify text/background combinations against WCAG AA during implementation.
 - Do not rely on color alone to communicate status.
 
-### 4.5 Token implementation
+### 4.6 Token implementation
 
 Prefer semantic role tokens over raw color values in components, such as `--color-brand-primary`, `--color-text-primary`, `--color-canvas`, `--color-surface`, `--color-border`, `--color-success`, `--color-error`, and subject role tokens.
 
@@ -140,7 +150,7 @@ Existing tokens should be mapped to these roles where practical. Avoid a destruc
 
 ## 5. Typography
 
-**Display / expressive:** Bricolage Grotesque  
+**Display / expressive:** Bricolage Grotesque Bold  
 **Interface / body:** Inter
 
 Bricolage Grotesque carries Nomi's personality. Inter carries utility and readability.
@@ -156,7 +166,7 @@ Bricolage Grotesque carries Nomi's personality. Inter carries utility and readab
 
 Rules:
 
-- Use Bricolage for meaningful hierarchy, not every label.
+- Use Bricolage Grotesque Bold for wordmark-adjacent personality, major headlines, and important brand statements; do not use it for every label.
 - Use Inter for controls, metadata, answers, navigation, form fields, and longer copy.
 - Page titles should feel editorial rather than dashboard-like.
 - Avoid excessive uppercase.
@@ -206,25 +216,25 @@ Stop rounding every element identically. Large radius should signal importance o
 
 ## 8. Surface Hierarchy
 
-### Level 0: Canvas
+### Level 0: Cream Canvas
 
 No card. Use for page headings, Tutor welcome content, Nomi conversational recommendations, curriculum grouping, explanatory copy, and Practice question composition.
 
 Use Level 0 more often than the current UI does.
 
-### Level 1: Soft Surface
+### Level 1: Lavender, Stone, and tinted learning surfaces
 
 Tinted or warm background with little or no shadow. Use for recommendations, subject context, explanatory information, selected subject worlds, and quiet callouts.
 
-### Level 2: Raised Surface
+### Level 2: White raised surface
 
 White surface, defined border, very subtle shadow when necessary. Use for active controls, composer, important form areas, and focused interactive modules.
 
-### Level 3: Brand Surface
+### Level 3: Purple brand surface
 
 Purple or subject-color-led surface used sparingly. Use for primary learning CTAs, Continue Learning hero, important progress moments, and small high-value hero areas.
 
-Avoid card-inside-card layouts, a white rectangle around every section, and heavy shadow as the only hierarchy mechanism. Prefer whitespace, typography, alignment, background shifts, selective color, and scale.
+White rounded cards are a normal hierarchy tool. Avoid redundant card-inside-card layouts, dashboard clutter, unnecessary borders, and heavy shadow as the only hierarchy mechanism. Prefer whitespace, typography, alignment, background shifts, selective color, and scale.
 
 ---
 
@@ -243,7 +253,9 @@ Avoid dramatic drop shadows, colored glow, purple glow, neumorphism, and glassmo
 
 ## 10. Iconography
 
-Use **Hugeicons Stroke Rounded** for core functional UI.
+**Functional UI uses Hugeicons Stroke Rounded. Brand and learning concepts use bespoke illustrated assets.**
+
+Functional UI includes navigation, settings, account, utility controls, form affordances, and status controls. Brand and learning concepts include subjects, achievements, learning moments, adaptive concepts, meaningful empty-state objects, and companion-adjacent concepts. Hugeicons must not become the sole visual identity of learning concepts.
 
 Free packages:
 
@@ -280,7 +292,7 @@ Decorative icons use `aria-hidden="true"`. Icon-only controls require an accessi
 Each subject has two layers:
 
 1. **Functional:** Hugeicons Stroke Rounded icon.
-2. **Expressive:** lightweight isometric educational composition.
+2. **Expressive:** bespoke illustrated learning composition.
 
 These are not interchangeable.
 
@@ -298,33 +310,48 @@ Leaf, cell, DNA, organic structures, membranes, cellular forms.
 
 ---
 
-## 12. Isometric Illustration System
+## 12. Soft-Dimensional Illustration System
 
-Isometric objects are part of Nomi's educational identity, not generic decoration.
+Illustrated learning objects are part of Nomi's educational identity, not generic decoration.
 
 Style:
 
-- Approximately 30° / isometric perspective
-- Simple geometry
-- Mostly flat faces
-- 2–3 tones per object
-- Rounded edges where appropriate
-- Extremely soft shadows
-- Occasional floating elements
-- Generous negative space
-- Editorial diagram quality
+- Soft dimensional vector forms
+- Rounded educational objects
+- Restrained depth and subtle shading
+- 2–3 controlled tones per object
+- Vibrant mint, yellow, and pink accents where meaningful
+- Companion-compatible compositions
+- Gentle shadows and generous negative space
 
-Think **educational objects arranged spatially**, not glossy game assets.
+Think **playful educational worlds with controlled depth**, not glossy game assets.
 
 Prefer original SVG, lightweight CSS geometry, simple reusable vector compositions, and locally stored assets. Do not silently introduce externally licensed illustration packs or runtime dependencies on third-party illustration CDNs.
 
-Use isometric artwork selectively in Home Continue Learning, subject exploration, Onboarding, meaningful empty states, Progress reflection, and occasional Nomi learning moments.
+Use illustrations selectively in Home Continue Learning, subject exploration, Onboarding, meaningful empty states, Progress reflection, and occasional Nomi learning moments. `SubjectVisual` remains the reusable abstraction; its existing assets will evolve in a later illustration milestone.
 
 Do not use isometric artwork for navigation icons, every card, generic buttons, form controls, or active Practice questions where it distracts from the task.
 
 ---
 
-## 13. Nomi Mascot
+## 13. Product Identity and Wordmark
+
+The approved product identity is the dedicated lowercase `nomi` wordmark extracted from the approved Nomi Brand Guide source asset. It is not typeset Bricolage text, reconstructed SVG geometry, or the learning companion.
+
+Use the wordmark for product identity at approved header, auth, and future app-icon lockup placements. Available variants are Ink on Cream/White, Primary Purple on Cream/White, and White on Purple.
+
+Identity hierarchy:
+
+- Primary vertical logo lockup: external and high-impact brand moments, including social previews, presentation, media, and promotional collateral.
+- Wordmark: persistent compact product identity, including application shell and functional auth contexts.
+- Mascot: contextual learning companion, never a logo substitute.
+- Horizontal lockup: external horizontal brand signature when the full composition has room.
+- Compact logo mark: browser favicon, Apple touch, PWA, and other tiny/system contexts.
+- Social preview: primary external sharing expression using approved production PNG assets.
+
+The legacy L-shaped glyph has no approved identity use and has been removed from application identity placements. Do not reintroduce it. The compact approved logo mark is used for PWA/app icon production.
+
+## 14. Nomi Character
 
 Nomi is the AI learning companion, not a decorative logo.
 
@@ -354,7 +381,7 @@ The mascot's state must correspond to a meaningful product state. Do not use ran
 
 ---
 
-## 14. Motion
+## 15. Motion
 
 Full mascot and educational-object motion belongs to a dedicated motion milestone.
 
@@ -366,7 +393,7 @@ Avoid constant bouncing, infinite attention-seeking motion, large parallax, exce
 
 ---
 
-## 15. Component Principles
+## 16. Component Principles
 
 Shared components should encode the visual system so individual screens do not recreate it.
 
@@ -387,7 +414,7 @@ A generic `Card` primitive is optional. Do not force every content block into it
 
 ---
 
-## 16. Buttons
+## 17. Buttons
 
 ### Primary
 
@@ -407,7 +434,7 @@ Disabled controls must look clearly inactive. Use neutral disabled tokens rather
 
 ---
 
-## 17. Status Badges and Chips
+## 18. Status Badges and Chips
 
 Badges communicate state. Chips communicate compact context or selectable information. Do not use pills as generic decoration.
 
@@ -422,7 +449,7 @@ Do not expose raw mastery percentages unless product requirements explicitly cal
 
 ---
 
-## 18. Feedback
+## 19. Feedback
 
 Practice and Tutor feedback should feel like Nomi responding to learning, not a system alert console.
 
@@ -452,7 +479,7 @@ Do not expose hidden reasoning or chain-of-thought.
 
 ---
 
-## 19. Screen Direction
+## 20. Screen Direction
 
 ### 19.1 Home
 
@@ -546,7 +573,7 @@ Keep authentication simple. Use typography, a small mascot moment, warm canvas, 
 
 ---
 
-## 20. Navigation
+## 21. Navigation
 
 Desktop navigation should remain calm and persistent.
 
@@ -563,7 +590,7 @@ Mobile bottom navigation remains the primary shell navigation: Home, Learn, Nomi
 
 ---
 
-## 21. Accessibility
+## 22. Accessibility
 
 Requirements:
 
@@ -582,7 +609,7 @@ Requirements:
 
 ---
 
-## 22. Responsive Behavior
+## 23. Responsive Behavior
 
 Nomi is mobile-first.
 
@@ -592,7 +619,7 @@ On desktop use additional width for better composition, whitespace, supporting v
 
 ---
 
-## 23. Empty States
+## 24. Empty States
 
 Empty states should explain what the learner can do next.
 
@@ -602,7 +629,7 @@ Do not fabricate content to avoid an empty screen. A truthful empty state is bet
 
 ---
 
-## 24. Loading and Error States
+## 25. Loading and Error States
 
 Loading should preserve layout stability. Prefer small skeletons, reserved space, or a Nomi thinking state where contextually appropriate.
 
@@ -612,7 +639,7 @@ Never expose provider errors, API keys, stack traces, Supabase details, or raw p
 
 ---
 
-## 25. Content Tone
+## 26. Content Tone
 
 Nomi's voice is warm, clear, encouraging, specific, occasionally witty, and never condescending.
 
@@ -634,7 +661,7 @@ Celebrate progress without infantilizing the learner. Avoid emoji as a substitut
 
 ---
 
-## 26. Visual Anti-Patterns
+## 27. Visual Anti-Patterns
 
 Do not introduce:
 
@@ -662,7 +689,7 @@ Do not introduce:
 
 ---
 
-## 27. Visual Hierarchy Test
+## 28. Visual Hierarchy Test
 
 Before considering a screen complete, ask:
 
@@ -681,11 +708,11 @@ If everything has equal visual weight, the hierarchy is wrong.
 
 ---
 
-## 28. Implementation Rules for Coding Agents
+## 29. Implementation Rules for Coding Agents
 
 Before changing a screen:
 
-1. Read this file.
+1. Read the approved Nomi Brand Guide and this implementation specification.
 2. Inspect existing shared components.
 3. Inspect existing product behavior and tests.
 4. Reuse or extend the shared system.
@@ -699,7 +726,7 @@ Do not rewrite working domain logic during a visual milestone, change canonical 
 
 ---
 
-## 29. Migration Strategy
+## 30. Migration Strategy
 
 ### Phase 1: Foundation
 
@@ -728,7 +755,7 @@ Refactor in this order:
 
 ### Phase 4: Educational visual layer
 
-Introduce lightweight original subject isometrics. Do not block functional visual cleanup on perfect illustrations.
+Evolve `SubjectVisual` toward original soft-dimensional educational illustrations. Do not block functional visual cleanup on perfect illustrations.
 
 ### Phase 5: Motion
 
@@ -736,7 +763,7 @@ Add Nomi and educational-object motion only after static visual hierarchy is cor
 
 ---
 
-## 30. Definition of Done
+## 31. Definition of Done
 
 A visual-system milestone is not complete merely because tokens or shared components exist. The actual product must visibly reflect the system.
 
@@ -745,7 +772,7 @@ Verify:
 - [ ] Hugeicons is the core functional icon language
 - [ ] No competing emoji subject icon system remains
 - [ ] Subject colors are consistent
-- [ ] Brand purple is controlled
+- [ ] Brand purple is controlled and visible at high-value moments
 - [ ] Disabled states are neutral and legible
 - [ ] Errors and warnings are visually distinct
 - [ ] Pages use canvas space instead of unnecessary cards
@@ -769,7 +796,7 @@ Verify:
 
 ---
 
-## 31. Final Principle
+## 32. Final Principle
 
 When choosing between adding more UI and improving composition, choose composition.
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { submitPracticeAttemptAction } from "@/server/practice/actions";
 import type { PracticeActionState } from "@/server/practice/types";
 import type { LearnerSafePracticeQuestionWithMeta } from "@/server/practice/questions";
@@ -16,7 +16,6 @@ import { MathText } from "./math-text";
 import {
   guidanceForResult,
   guidanceHeading,
-  reactionForResult,
   type PracticeGuidance,
 } from "./feedback";
 
@@ -55,7 +54,7 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
     const wrappedUp = answeredCount > 0;
     return (
       <section className="mx-auto flex max-w-[560px] flex-col items-center gap-4 px-2 py-8 text-center">
-        <NomiMascot state={wrappedUp ? "celebrating" : "curious"} size={56} />
+        <NomiCharacter state={wrappedUp ? "celebrating" : "curious"} size={80} />
         <h1 className="font-display text-2xl font-bold text-nomi-ink">
           {wrappedUp ? "Practice is all wrapped up." : "No practice questions right now."}
         </h1>
@@ -81,16 +80,6 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
   const canSubmit = hasSelection && interactive;
   const revealCorrect = submitted && Boolean(state.result?.correct);
 
-  function reaction() {
-    if (isPending) {
-      return "thinking" as const;
-    }
-    if (submitted && state.result) {
-      return reactionForResult(state.result);
-    }
-    return "curious" as const;
-  }
-
   function handleRetry() {
     if (state.result) {
       setPersistedGuidance(guidanceForResult(state.result));
@@ -113,7 +102,7 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
 
   return (
     <div className="mx-auto max-w-[640px]">
-      <PracticeHeader conceptName={question.conceptName} reaction={reaction()} />
+      <PracticeHeader conceptName={question.conceptName} />
 
       <form
         action={formAction}

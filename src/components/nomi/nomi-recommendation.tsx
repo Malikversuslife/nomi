@@ -1,4 +1,5 @@
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
+import { characterStateForIntervention } from "@/components/nomi/nomi-character-state";
 
 type InterventionType =
   | "continue"
@@ -20,7 +21,7 @@ const interventionCopy: Record<InterventionType, (topic?: string) => string> = {
   retry: () => "Give it another attempt.",
   increase_challenge: () => "You are ready for something tougher.",
   review_prerequisite: (t) =>
-    t ? `Let's revisit ${t} — it will make the next part easier.` : "Let's revisit a key idea first.",
+    t ? `Let's revisit ${t}. It will make the next part easier.` : "Let's revisit a key idea first.",
 };
 
 export function NomiRecommendation({
@@ -32,8 +33,8 @@ export function NomiRecommendation({
 }) {
   if (!intervention) {
     return (
-      <section className="mb-5 flex items-center gap-3 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle px-4 py-3 sm:mb-6">
-        <NomiMascot state="neutral" size={40} className="flex-shrink-0" />
+      <section className="mb-5 flex items-center gap-3 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle px-4 py-3 sm:mb-6">
+        <NomiCharacter state="neutral" size={40} className="flex-shrink-0" />
         <p className="text-sm leading-relaxed text-nomi-muted">
           Complete a practice session and Nomi will have recommendations for you.
         </p>
@@ -44,8 +45,12 @@ export function NomiRecommendation({
   const message = interventionCopy[intervention](topicName);
 
   return (
-    <section className="mb-5 flex items-start gap-3 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle px-4 py-4 sm:mb-6">
-      <NomiMascot state="curious" size={40} className="mt-0.5 flex-shrink-0" />
+    <section className="mb-5 flex items-start gap-3 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle px-4 py-4 sm:mb-6">
+      <NomiCharacter
+        state={characterStateForIntervention(intervention)}
+        size={40}
+        className="mt-0.5 flex-shrink-0"
+      />
       <div>
         <p className="text-xs font-semibold tracking-[0.06em] text-nomi-purple-700">
           Nomi recommends

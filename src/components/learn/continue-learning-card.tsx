@@ -1,7 +1,7 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { AppIcon } from "@/components/ui/app-icon";
 import { ButtonLink } from "@/components/ui/button";
-import { SubjectVisual } from "@/components/ui/subject-visual";
+import { Subject3DVisual } from "@/components/ui/subject-visual";
 import { subjectIdentityForName } from "@/components/ui/subject-identity";
 
 export function ContinueLearningCard({
@@ -41,7 +41,7 @@ export function ContinueLearningCard({
 
   return (
     <section
-      className="relative mb-5 overflow-hidden rounded-[var(--nomi-radius-feature)] px-5 py-6 sm:mb-6 sm:grid sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8 sm:px-8 sm:py-8"
+      className="relative mb-5 overflow-hidden rounded-[var(--nomi-radius-feature)] border border-nomi-border px-5 py-6 sm:mb-6 sm:grid sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8 sm:px-8 sm:py-8"
       style={{ backgroundColor: identity.soft }}
     >
       <div className="relative z-10 min-w-0">
@@ -68,7 +68,7 @@ export function ContinueLearningCard({
         aria-hidden="true"
         className="pointer-events-none absolute right-0 bottom-0 hidden translate-y-4 sm:static sm:block sm:translate-y-0"
       >
-        <SubjectVisual subject={subject} size="lg" className="h-44 w-44 shrink-0" />
+        <Subject3DVisual subject={subject} size="lg" className="h-44 w-44 shrink-0" />
       </div>
     </section>
   );

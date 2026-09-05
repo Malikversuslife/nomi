@@ -95,7 +95,7 @@ describe("OnboardingExperience", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Step 1 of 3")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Get started" })).toBeInTheDocument();
-    expect(document.querySelector("[data-state='encouraging']")).not.toBeNull();
+    expect(document.querySelector("[data-state='neutral']")).not.toBeNull();
   });
 
   it("greets the learner by display name when one exists", () => {
@@ -127,7 +127,7 @@ describe("OnboardingExperience", () => {
       ).toBeInTheDocument();
     }
 
-    expect(document.querySelector("[data-state='curious']")).not.toBeNull();
+    expect(document.querySelector("[data-state]")).toBeNull();
   });
 
   it("requires a subject before allowing Continue", () => {
@@ -180,6 +180,7 @@ describe("OnboardingExperience", () => {
     expect(screen.getByText("Quadratic equations")).toBeInTheDocument();
     expect(screen.getByText("Factorisation")).toBeInTheDocument();
     expect(document.querySelector("[data-state='celebrating']")).not.toBeNull();
+    expect(document.querySelector("img[data-subject-visual='mathematics']")).not.toBeNull();
   });
 
   it("shows a unit-level first topic without a phantom group", () => {

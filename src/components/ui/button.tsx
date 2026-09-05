@@ -6,7 +6,7 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-nomi-purple-600 text-white hover:bg-nomi-purple-700 disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text disabled:shadow-none",
+    "bg-nomi-purple-600 text-nomi-on-primary hover:bg-nomi-purple-700 active:bg-nomi-purple-700 disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text disabled:shadow-none",
   secondary:
     "border border-nomi-border bg-nomi-surface text-nomi-ink hover:border-nomi-purple-500 hover:bg-nomi-purple-100 disabled:border-transparent disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text",
 };

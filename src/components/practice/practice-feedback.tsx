@@ -31,19 +31,31 @@ export function PracticeFeedback({
 }) {
   const copy = feedbackCopy(result);
   const guidance = guidanceForResult(result);
+  const reaction = reactionForResult(result);
+  const celebrating = reaction === "celebrating";
 
   return (
     <section
       aria-live="polite"
-      className="space-y-4 rounded-[var(--nomi-radius-feature)] bg-nomi-surface-subtle p-5 sm:p-6"
+      className="space-y-4 rounded-[var(--nomi-radius-feature)] border border-nomi-border bg-nomi-surface-subtle p-5 sm:p-6"
     >
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h2 className="font-display text-2xl font-bold text-nomi-ink">{copy.title}</h2>
-          <p className="mt-1 text-sm leading-relaxed text-nomi-muted">{copy.message}</p>
+      {celebrating ? (
+        <div className="flex items-start gap-3 sm:gap-4">
+          <NomiReaction state={reaction} size={56} className="shrink-0 pt-0.5" />
+          <div className="min-w-0">
+            <h2 className="font-display text-2xl font-bold text-nomi-ink">{copy.title}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-nomi-muted">{copy.message}</p>
+          </div>
         </div>
-        <NomiReaction state={reactionForResult(result)} size={44} />
-      </div>
+      ) : (
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-nomi-ink">{copy.title}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-nomi-muted">{copy.message}</p>
+          </div>
+          <NomiReaction state={reaction} size={44} />
+        </div>
+      )}
 
       {guidance && (
         <FeedbackBanner variant="info" title={guidanceHeading[guidance.kind]}>

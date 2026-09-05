@@ -6,7 +6,7 @@ import { StatusBadge, topicStateTone } from "@/components/ui/status-badge";
 
 function TopicRow({ topic }: { topic: TopicProgressView }) {
   return (
-    <li className="flex items-start gap-3 rounded-[var(--nomi-radius-medium)] bg-nomi-surface-subtle p-3.5 sm:p-4">
+    <li className="flex items-start gap-3 rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface-subtle p-3.5 sm:p-4">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="text-sm font-semibold text-nomi-ink">{topic.name}</span>

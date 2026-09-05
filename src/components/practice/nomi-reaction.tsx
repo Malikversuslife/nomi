@@ -1,4 +1,4 @@
-import { NomiMascot, type NomiMascotState } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter, type NomiCharacterState } from "@/components/nomi/nomi-character";
 
 export function NomiReaction({
   state,
@@ -6,14 +6,14 @@ export function NomiReaction({
   caption,
   className,
 }: {
-  state: NomiMascotState;
+  state: NomiCharacterState;
   size?: number;
   caption?: string;
   className?: string;
 }) {
   return (
     <div className={`flex items-center gap-3 ${className ?? ""}`}>
-      <NomiMascot state={state} size={size} />
+      <NomiCharacter state={state} size={size} />
       {caption && (
         <p className="text-sm font-medium text-nomi-muted">{caption}</p>
       )}

@@ -1,4 +1,4 @@
-import type { NomiMascotState } from "@/components/nomi/nomi-mascot";
+import type { NomiCharacterState } from "@/components/nomi/nomi-character";
 
 export type GuidanceKind = "hint" | "worked-example" | "simplify";
 
@@ -30,7 +30,7 @@ type ResultSummary = {
 const correctMessages: Record<string, string> = {
   continue: "You got it right.",
   reinforce: "You got it right. Let's do one more like this to make sure the pattern sticks.",
-  "increase-challenge": "You got it right — you're ready for something tougher.",
+  "increase-challenge": "You got it right. You're ready for something tougher.",
   "worked-example": "You got it right. Let's lock it in by working through one together.",
   simplify: "You got it right. Let's try a simpler take so it really sticks.",
   "review-prerequisite": "You got it right. Let's revisit one idea that will make this easier.",
@@ -72,7 +72,7 @@ export function guidanceForResult(result: ResultSummary): PracticeGuidance | nul
   return null;
 }
 
-export function reactionForResult(result: ResultSummary): NomiMascotState {
+export function reactionForResult(result: ResultSummary): NomiCharacterState {
   if (result.correct) {
     if (result.intervention === "increase-challenge" && (result.difficultyChange ?? 0) > 0) {
       return "challenge";

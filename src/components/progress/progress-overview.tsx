@@ -33,7 +33,7 @@ export function ProgressOverview({ overview }: { overview: ProgressOverview }) {
   return (
     <section
       aria-labelledby="progress-overview-heading"
-      className="rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle p-5 sm:p-6"
+      className="rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle p-5 sm:p-6"
     >
       <h2
         id="progress-overview-heading"

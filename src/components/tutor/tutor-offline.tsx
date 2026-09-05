@@ -1,11 +1,11 @@
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export function TutorOffline() {
   return (
     <EmptyState
-      icon={<NomiMascot state="neutral" size={56} />}
+      icon={<NomiCharacter state="supportive" size={80} />}
       title="Nomi is unavailable right now."
       description="You can keep practising or explore your learning path."
     >

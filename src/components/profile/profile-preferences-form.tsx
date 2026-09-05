@@ -132,7 +132,7 @@ export function ProfilePreferencesForm({
       ) : null}
 
       <button
-        className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-white shadow-sm transition-colors hover:bg-nomi-purple-700 disabled:cursor-not-allowed disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text"
+        className="min-h-12 w-full rounded-[var(--nomi-radius-pill)] bg-nomi-purple-600 px-5 font-semibold text-nomi-on-primary shadow-sm transition-colors hover:bg-nomi-purple-700 active:bg-nomi-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text"
         type="submit"
         disabled={pending}
       >

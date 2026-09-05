@@ -10,7 +10,7 @@ import type { IconSvgElement } from "@hugeicons/react";
 import { hasSupabaseConfig } from "@/server/env";
 import { getAccountContext } from "@/server/profile/data";
 import { AccountMenu } from "@/components/account/account-menu";
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiWordmark } from "@/components/nomi/nomi-wordmark";
 import { AppIcon } from "@/components/ui/app-icon";
 
 type NavItem = { href: string; label: string; icon: IconSvgElement };
@@ -57,9 +57,8 @@ export async function FoundationShell({
         aria-label="Main navigation"
         className="fixed inset-y-0 left-0 top-0 hidden h-full w-64 flex-col border-r border-nomi-border bg-nomi-surface px-4 pt-6 lg:flex"
       >
-        <div className="mb-8 flex items-center gap-3 px-2">
-          <NomiMascot state="neutral" size={32} />
-          <h2 className="font-display text-lg font-bold tracking-[-0.03em] text-nomi-ink">Nomi</h2>
+        <div className="mb-8 px-2">
+          <NomiWordmark width={112} label="Nomi" />
         </div>
 
         <nav className="flex-1 space-y-1">
@@ -71,10 +70,10 @@ export async function FoundationShell({
                 key={item.href}
                 href={item.href}
                 className={`
-                  flex items-center gap-3 rounded-[var(--nomi-radius-medium)] px-3 py-2.5 text-sm transition-colors duration-200
+                  flex items-center gap-3 rounded-[var(--nomi-radius-medium)] border border-transparent px-3 py-2.5 text-sm transition-colors duration-200
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-1
                   ${isActive
-                    ? "bg-nomi-purple-100 font-semibold text-nomi-ink"
+                    ? "border-nomi-purple-500/50 bg-nomi-purple-100 font-semibold text-nomi-ink"
                     : "font-medium text-nomi-muted hover:bg-nomi-purple-50 hover:text-nomi-ink"
                   }
                 `}
@@ -107,11 +106,8 @@ export async function FoundationShell({
         className="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 border-b border-nomi-border bg-nomi-surface px-4 lg:hidden"
         style={{ paddingTop: "var(--nomi-safe-top)" }}
       >
-        <div className="flex min-h-14 items-center gap-2.5">
-          <NomiMascot state="neutral" size={28} />
-          <h2 className="font-display text-base font-bold tracking-[-0.03em] text-nomi-ink">
-            Nomi
-          </h2>
+        <div className="flex min-h-14 items-center">
+          <NomiWordmark width={88} label="Nomi" />
         </div>
         <AccountMenu
           name={account?.name ?? null}
@@ -142,10 +138,10 @@ function MobileNav({ active }: { active: string }) {
             <li key={item.href} className="flex-1">
               <Link
                 className={`
-                  flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-[var(--nomi-radius-pill)] px-2 py-1.5
+                  flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-[var(--nomi-radius-pill)] border border-transparent px-2 py-1.5
                   transition-colors duration-200
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-1
-                  ${isActive ? "bg-nomi-purple-100" : ""}
+                  ${isActive ? "border-nomi-purple-500/50 bg-nomi-purple-100" : ""}
                 `}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}

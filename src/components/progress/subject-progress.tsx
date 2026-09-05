@@ -37,7 +37,7 @@ function SubjectCard({ subject }: { subject: SubjectProgressView }) {
 
   return (
     <li
-      className="rounded-[var(--nomi-radius-large)] p-4 sm:p-5"
+      className="rounded-[var(--nomi-radius-large)] border border-nomi-border p-4 sm:p-5"
       style={{ backgroundColor: identity.soft }}
     >
       <div className="flex items-center gap-3">

@@ -4,7 +4,7 @@ import { StatusBadge, topicStateTone } from "@/components/ui/status-badge";
 
 function TopicRow({ topic }: { topic: LearnTopicRowView }) {
   return (
-    <li className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[var(--nomi-radius-medium)] bg-nomi-surface-subtle px-3.5 py-2.5">
+    <li className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[var(--nomi-radius-medium)] border border-nomi-border bg-nomi-surface-subtle px-3.5 py-2.5">
       <span className="min-w-0 flex-1 text-sm font-semibold text-nomi-ink">{topic.name}</span>
       <StatusBadge tone={topicStateTone(topic.state.key)} label={topic.state.label} />
       {topic.state.cue ? (

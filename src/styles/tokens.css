@@ -1,41 +1,45 @@
 :root {
-  --nomi-purple-700: #5425ae;
-  --nomi-purple-600: #7540d8;
-  --nomi-purple-500: #a77aef;
-  --nomi-purple-200: #e4d8fa;
-  --nomi-purple-100: #ede3ff;
-  --nomi-purple-50: #f6f1ff;
-
-  --nomi-mint-500: #6dd8b5;
-  --nomi-mint-100: #ddf7ee;
-
-  --nomi-yellow-500: #f4c94f;
-  --nomi-yellow-100: #fff4c7;
-
-  --nomi-pink-500: #ef8eb7;
-  --nomi-pink-100: #fbe2ec;
-
-  --nomi-ink: #211d27;
-  --nomi-muted: #69636f;
+  /* Canonical colors from the approved Nomi Brand Guide. */
+  --nomi-purple-600: #6c3cff;
+  --nomi-mint-500: #2bd4a1;
+  --nomi-yellow-500: #ffd43b;
+  --nomi-pink-500: #ff8aae;
+  --nomi-purple-100: #e9e6ff;
+  --nomi-ink: #111827;
+  --nomi-muted: #475569;
+  --nomi-stone: #f2f2f7;
+  --nomi-background: #fff9f2;
   --nomi-surface: #ffffff;
-  --nomi-background: #fbf8f3;
-  --nomi-border: #e5ded7;
+
+  /* Derived tones: these preserve contrast or create controlled depth without
+     replacing the canonical guide colors above. */
+  --nomi-purple-700: #4c1dcc;
+  --nomi-purple-500: #8b6cff;
+  --nomi-purple-200: #f1eeff;
+  --nomi-purple-50: #f7f5ff;
+  --nomi-mint-700: #004d3a;
+  --nomi-mint-100: #ddf9f0;
+  --nomi-yellow-700: #7a4a00;
+  --nomi-yellow-100: #fff5cc;
+  --nomi-pink-700: #a32655;
+  --nomi-pink-100: #ffe5ed;
+  --nomi-border: #e6e4ec;
 
   --nomi-on-primary: #ffffff;
-  --nomi-surface-subtle: #f5f0e9;
+  --nomi-surface-subtle: var(--nomi-stone);
   --nomi-surface-raised: #ffffff;
-  --nomi-border-subtle: #efeae4;
-  --nomi-border-strong: #dacfc2;
+  --nomi-border-subtle: #efedf4;
+  --nomi-border-strong: #d6d2e0;
 
   --nomi-disabled-bg: #e7e2ea;
   --nomi-disabled-text: #99929e;
 
   --nomi-success-500: #177a5e;
-  --nomi-success-100: #ddf7ee;
+  --nomi-success-100: var(--nomi-mint-100);
   --nomi-warning-500: #8a6500;
-  --nomi-warning-100: #fff4c7;
+  --nomi-warning-100: var(--nomi-yellow-100);
   --nomi-error-500: #b5475f;
-  --nomi-error-100: #fde8ed;
+  --nomi-error-100: var(--nomi-pink-100);
   --nomi-info-500: #3567c8;
   --nomi-info-100: #eaf0ff;
 

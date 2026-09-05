@@ -1,4 +1,4 @@
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { TutorClientContext } from "@/domain/tutor/types";
@@ -28,7 +28,7 @@ export function TutorEmptyState({
 
   return (
     <EmptyState
-      icon={<NomiMascot state="curious" size={64} />}
+      icon={<NomiCharacter state="curious" size={112} />}
       title="What are you stuck on?"
       description="I can explain a concept, work through a problem, or give you a hint."
     >

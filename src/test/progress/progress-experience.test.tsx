@@ -41,7 +41,7 @@ function sampleData(overrides: Partial<ProgressExperienceData> = {}): ProgressEx
         state: {
           key: "needs-practice",
           label: "Needs practice",
-          cue: "A few recent answers went sideways — one more go will settle the pattern.",
+          cue: "A few recent answers went sideways. One more go will settle the pattern.",
           actionLabel: "Practise again",
         },
         recentlyPractised: true,

@@ -1,7 +1,7 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { AppIcon } from "@/components/ui/app-icon";
 import { ButtonLink } from "@/components/ui/button";
-import { SubjectVisual } from "@/components/ui/subject-visual";
+import { Subject3DVisual } from "@/components/ui/subject-visual";
 import { subjectIdentityForName } from "@/components/ui/subject-identity";
 import type { LearnContinueView } from "@/domain/learn/types";
 
@@ -29,7 +29,7 @@ export function LearnContinueCard({ view }: { view: LearnContinueView }) {
 
   return (
     <section
-      className="relative overflow-hidden rounded-[var(--nomi-radius-feature)] px-5 py-6 sm:grid sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8 sm:px-8 sm:py-7"
+      className="relative overflow-hidden rounded-[var(--nomi-radius-feature)] border border-nomi-border px-5 py-6 sm:grid sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8 sm:px-8 sm:py-7"
       style={{ backgroundColor: identity.soft }}
     >
       <div className="relative z-10 min-w-0">
@@ -52,7 +52,7 @@ export function LearnContinueCard({ view }: { view: LearnContinueView }) {
       </div>
 
       <div aria-hidden="true" className="hidden sm:block">
-        <SubjectVisual subject={view.subjectName} size="lg" className="h-40 w-40 shrink-0" />
+        <Subject3DVisual subject={view.subjectName} size="lg" className="h-40 w-40 shrink-0" />
       </div>
     </section>
   );

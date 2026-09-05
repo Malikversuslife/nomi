@@ -1,10 +1,10 @@
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
 import type { LearnInsightView } from "@/domain/learn/types";
 
 export function NomiLearnInsight({ view }: { view: LearnInsightView }) {
   return (
-    <section className="flex items-start gap-3 rounded-[var(--nomi-radius-large)] bg-nomi-surface-subtle px-4 py-4">
-      <NomiMascot state="curious" size={36} className="mt-0.5 flex-shrink-0" />
+    <section className="flex items-start gap-3 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle px-4 py-4">
+      <NomiCharacter state="curious" size={36} className="mt-0.5 flex-shrink-0" />
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-nomi-ink/60">
           Nomi suggests

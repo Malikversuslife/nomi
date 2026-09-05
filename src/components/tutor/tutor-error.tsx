@@ -11,7 +11,11 @@ export function TutorError({ onRetry }: { onRetry: () => void }) {
         </Button>
       }
     >
-      Nomi couldn&apos;t answer that just now.
+      <span className="flex items-center gap-2">
+        <NomiCharacter state="supportive" size={32} />
+        Nomi couldn&apos;t answer that just now.
+      </span>
     </FeedbackBanner>
   );
 }
+import { NomiCharacter } from "@/components/nomi/nomi-character";

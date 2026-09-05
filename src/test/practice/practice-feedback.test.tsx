@@ -105,6 +105,20 @@ describe("PracticeFeedback", () => {
     expect(screen.queryByRole("button", { name: /Try again/ })).not.toBeInTheDocument();
   });
 
+  it("keeps a meaningful celebration beside the feedback copy at 56px", () => {
+    const { container } = render(
+      <PracticeFeedback
+        onContinue={() => {}}
+        onRetry={() => {}}
+        result={engineResult({ correct: true, intervention: "continue", consecutiveCorrect: 3 })}
+      />,
+    );
+
+    const celebration = container.querySelector('img[data-state="celebrating"]');
+    expect(celebration).toHaveAttribute("width", "56");
+    expect(celebration?.parentElement?.nextElementSibling?.textContent).toContain("Nice work.");
+  });
+
   it("fires onRetry when Try again is pressed", () => {
     const onRetry = vi.fn();
     render(

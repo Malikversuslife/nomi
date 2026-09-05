@@ -7,7 +7,7 @@ const variantClasses: Record<"secondary" | "primary", string> = {
   secondary:
     "border-nomi-border bg-nomi-surface text-nomi-muted hover:bg-nomi-purple-100 hover:text-nomi-purple-700",
   primary:
-    "border-transparent bg-nomi-purple-600 text-white hover:bg-nomi-purple-700",
+    "border-transparent bg-nomi-purple-600 text-nomi-on-primary hover:bg-nomi-purple-700 active:bg-nomi-purple-700",
 };
 
 export function iconButtonClasses(

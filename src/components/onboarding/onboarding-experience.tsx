@@ -3,9 +3,9 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { CircleCheckIcon } from "@hugeicons/core-free-icons";
 import { AppIcon } from "@/components/ui/app-icon";
-import { NomiMascot } from "@/components/nomi/nomi-mascot";
+import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { SubjectIcon } from "@/components/ui/subject-icon";
-import { SubjectVisual } from "@/components/ui/subject-visual";
+import { Subject3DVisual } from "@/components/ui/subject-visual";
 import { subjectIdentityForName, subjectIdentityForIconKey } from "@/components/ui/subject-identity";
 import { Button } from "@/components/ui/button";
 import { FeedbackBanner } from "@/components/ui/feedback-banner";
@@ -105,7 +105,7 @@ function WelcomeStep({
   return (
     <section className="text-center">
       <ProgressCue current={1} total={3} />
-      <NomiMascot state="encouraging" size={72} className="mx-auto" />
+      <NomiCharacter state="neutral" size={112} className="mx-auto" />
       <p className="mt-5 text-sm font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
         Your first lesson
       </p>
@@ -145,7 +145,6 @@ function SubjectStep({
   return (
     <section className="mx-auto w-full max-w-md text-center">
       <ProgressCue current={2} total={3} />
-      <NomiMascot state="curious" size={72} className="mx-auto" />
       <p className="mt-5 text-sm font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
         Choose your path
       </p>
@@ -261,7 +260,7 @@ function ReadyStep({
   return (
     <section className="mx-auto w-full max-w-md text-center">
       <ProgressCue current={3} total={3} />
-      <NomiMascot state="celebrating" size={72} className="mx-auto" />
+      <NomiCharacter state="celebrating" size={104} className="mx-auto" />
       <p className="mt-5 text-sm font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
         Ready to go
       </p>
@@ -281,7 +280,7 @@ function ReadyStep({
           className="mt-6 flex items-start gap-4 rounded-[var(--nomi-radius-large)] p-4 text-left"
           style={{ backgroundColor: identity.soft }}
         >
-          <SubjectVisual
+          <Subject3DVisual
             subject={subject.name}
             size="sm"
             className="hidden shrink-0 sm:block"
