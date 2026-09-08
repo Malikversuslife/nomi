@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Link } from "expo-router";
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { colors, radius, spacing } from "@/theme/tokens";
@@ -38,14 +38,15 @@ export default function HomeScreen() {
             <Text style={styles.progressValue}>64%</Text>
           </View>
 
-          <Pressable
-            style={styles.primaryButton}
-            accessibilityRole="button"
-            accessibilityLabel="Continue Factorisation"
-            onPress={() => router.push("/(tabs)/practice")}
-          >
-            <Text style={styles.primaryButtonText}>Continue learning</Text>
-          </Pressable>
+          <Link href="/practice" asChild>
+            <Pressable
+              style={styles.primaryButton}
+              accessibilityRole="button"
+              accessibilityLabel="Continue Factorisation"
+            >
+              <Text style={styles.primaryButtonText}>Continue learning</Text>
+            </Pressable>
+          </Link>
         </View>
 
         <View style={styles.insightCard}>
