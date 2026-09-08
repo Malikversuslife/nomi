@@ -53,6 +53,7 @@ export default function PracticeScreen() {
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
+  const [outcomes, setOutcomes] = useState<boolean[]>([]);
   const [complete, setComplete] = useState(false);
 
   const question = questions[questionIndex];
@@ -68,7 +69,9 @@ export default function PracticeScreen() {
     if (!selected) return;
 
     if (!checked) {
-      if (selected === question.correctAnswer) setScore((current) => current + 1);
+      const correct = selected === question.correctAnswer;
+      if (correct) setScore((current) => current + 1);
+      setOutcomes((current) => [...current, correct]);
       setChecked(true);
       return;
     }
@@ -77,8 +80,8 @@ export default function PracticeScreen() {
       recordSession({
         subject: "Mathematics",
         topic: "Factorisation",
-        score,
-        total: questions.length,
+        outcomes,
+        difficulty: 3,
       });
       setComplete(true);
       return;
@@ -94,6 +97,7 @@ export default function PracticeScreen() {
     setSelected(null);
     setChecked(false);
     setScore(0);
+    setOutcomes([]);
     setComplete(false);
   }
 
@@ -106,7 +110,7 @@ export default function PracticeScreen() {
           <Text style={styles.completionTitle}>Nice work. You finished the set.</Text>
           <Text style={styles.completionScore}>{score} / {questions.length} correct</Text>
           <Text style={styles.completionBody}>
-            Nomi will use this session to decide what to reinforce and how challenging the next set should be.
+            Your ordered attempts have now been evaluated by Nomi's deterministic mastery engine.
           </Text>
           <Pressable style={[styles.button, styles.completionButton]} onPress={restartSession} accessibilityRole="button">
             <Text style={styles.buttonText}>Practice again</Text>
