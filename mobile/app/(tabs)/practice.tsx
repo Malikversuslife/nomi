@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Image, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
+import { usePracticeProgress } from "@/progress/PracticeProgressContext";
 import { colors, radius, spacing } from "@/theme/tokens";
 
 const mascotBase =
@@ -47,6 +48,7 @@ const questions: Question[] = [
 ];
 
 export default function PracticeScreen() {
+  const { recordSession } = usePracticeProgress();
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -72,6 +74,12 @@ export default function PracticeScreen() {
     }
 
     if (questionIndex === questions.length - 1) {
+      recordSession({
+        subject: "Mathematics",
+        topic: "Factorisation",
+        score,
+        total: questions.length,
+      });
       setComplete(true);
       return;
     }
