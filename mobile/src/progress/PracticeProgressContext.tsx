@@ -14,10 +14,18 @@ export type PracticeSessionSummary = {
   completedAt: string;
 };
 
+export type PracticeAttemptInput = {
+  prompt: string;
+  learnerAnswer: string;
+  expectedAnswer: string;
+  isCorrect: boolean;
+};
+
 type RecordSessionInput = {
   topic: string;
   subject: string;
   outcomes: boolean[];
+  attempts: PracticeAttemptInput[];
   difficulty: number;
 };
 
@@ -206,7 +214,7 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
         const correctCount = (existingProgress?.correct_count ?? 0) + score;
         const recentAccuracy = accuracy;
 
-        const { error: progressWriteError } = await supabase
+        const { data: progress, error: progressWriteError } = await supabase
           .from("topic_progress")
           .upsert(
             {
@@ -221,12 +229,44 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
               last_practiced_at: completedAt,
             },
             { onConflict: "user_id,topic_id" },
-          );
-        if (progressWriteError) throw new Error("progress-write");
+          )
+          .select("id")
+          .single();
+        if (progressWriteError || !progress) throw new Error("progress-write");
+
+        const sessionKey = `mobile-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        const attemptRows = session.attempts.map((attempt, index) => ({
+          user_id: user.id,
+          topic_progress_id: progress.id,
+          topic_id: topic.id,
+          concept_name: "Factorisation",
+          difficulty: session.difficulty,
+          question_snapshot: {
+            prompt: attempt.prompt,
+            question_type: "multiple_choice",
+            source: "mobile_native",
+          },
+          expected_answer: { accepted: [attempt.expectedAnswer] },
+          learner_answer: { value: attempt.learnerAnswer },
+          is_correct: attempt.isCorrect,
+          response_time_ms: null,
+          misconception_category: attempt.isCorrect ? null : "conceptual_understanding",
+          subject_name_snapshot: session.subject,
+          topic_name_snapshot: session.topic,
+          learning_session_id: null,
+          submission_key: `${sessionKey}-${index + 1}`,
+        }));
+
+        if (attemptRows.length > 0) {
+          const { error: attemptsWriteError } = await supabase
+            .from("practice_attempts")
+            .insert(attemptRows);
+          if (attemptsWriteError) throw new Error("attempts-write");
+        }
 
         setMasterySource("supabase");
       } catch {
-        setSyncError("Practice finished locally, but Nomi could not save this progress to Supabase yet.");
+        setSyncError("Practice finished locally, but Nomi could not save all learner evidence to Supabase yet.");
       } finally {
         setSyncing(false);
       }
