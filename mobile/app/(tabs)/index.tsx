@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { colors, radius, spacing } from "@/theme/tokens";
@@ -37,7 +38,12 @@ export default function HomeScreen() {
             <Text style={styles.progressValue}>64%</Text>
           </View>
 
-          <Pressable style={styles.primaryButton} accessibilityRole="button">
+          <Pressable
+            style={styles.primaryButton}
+            accessibilityRole="button"
+            accessibilityLabel="Continue Factorisation"
+            onPress={() => router.push("/(tabs)/practice")}
+          >
             <Text style={styles.primaryButtonText}>Continue learning</Text>
           </Pressable>
         </View>
@@ -73,22 +79,9 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.xxl },
   topBar: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
   wordmark: { color: colors.primaryPurple, fontSize: 30, fontWeight: "900", letterSpacing: -1.5 },
-  profile: {
-    alignItems: "center",
-    backgroundColor: colors.lavender,
-    borderRadius: radius.pill,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
+  profile: { alignItems: "center", backgroundColor: colors.lavender, borderRadius: radius.pill, height: 40, justifyContent: "center", width: 40 },
   profileText: { color: colors.primaryPurple, fontSize: 15, fontWeight: "800" },
-  hero: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: spacing.xl,
-    minHeight: 142,
-  },
+  hero: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: spacing.xl, minHeight: 142 },
   heroCopy: { flex: 1, paddingRight: spacing.sm },
   kicker: { color: colors.primaryPurple, fontSize: 12, fontWeight: "800", letterSpacing: 1.4 },
   title: { color: colors.ink, fontSize: 34, fontWeight: "800", letterSpacing: -1.2, lineHeight: 38, marginTop: 6 },
