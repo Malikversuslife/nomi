@@ -29,7 +29,7 @@ type PracticeProgressContextValue = {
   masterySource: MasterySource;
   syncing: boolean;
   syncError: string | null;
-  recordSession: (session: RecordSessionInput) => void;
+  recordSession: (session: RecordSessionInput) => Promise<void>;
 };
 
 const PracticeProgressContext = createContext<PracticeProgressContextValue | null>(null);
@@ -144,11 +144,12 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
     masterySource,
     syncing,
     syncError,
-    recordSession: (session) => {
+    recordSession: async (session) => {
       const calculation = calculateMastery(mastery, session.outcomes, session.difficulty);
       const score = session.outcomes.filter(Boolean).length;
       const total = session.outcomes.length;
       const accuracy = total > 0 ? Math.round((score / total) * 100) : 0;
+      const completedAt = new Date().toISOString();
 
       setMastery(calculation.mastery);
       setLatestSession({
@@ -159,10 +160,78 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
         accuracy,
         mastery: calculation.mastery,
         masteryChange: calculation.delta,
-        completedAt: new Date().toISOString(),
+        completedAt,
       });
+
+      if (!user || !supabase) return;
+
+      setSyncing(true);
+      setSyncError(null);
+
+      try {
+        const { data: subject, error: subjectError } = await supabase
+          .from("subjects")
+          .select("id")
+          .eq("slug", "mathematics")
+          .single();
+        if (subjectError || !subject) throw new Error("subject");
+
+        const { data: topic, error: topicError } = await supabase
+          .from("topics")
+          .select("id")
+          .eq("slug", "factorisation")
+          .eq("subject_id", subject.id)
+          .maybeSingle();
+        if (topicError || !topic) throw new Error("topic");
+
+        const { data: learnerSubject, error: learnerSubjectError } = await supabase
+          .from("learner_subjects")
+          .upsert(
+            { user_id: user.id, subject_id: subject.id, status: "active" },
+            { onConflict: "user_id,subject_id" },
+          )
+          .select("id")
+          .single();
+        if (learnerSubjectError || !learnerSubject) throw new Error("learner-subject");
+
+        const { data: existingProgress, error: existingProgressError } = await supabase
+          .from("topic_progress")
+          .select("id,attempted_count,correct_count")
+          .eq("user_id", user.id)
+          .eq("topic_id", topic.id)
+          .maybeSingle();
+        if (existingProgressError) throw new Error("progress-read");
+
+        const attemptedCount = (existingProgress?.attempted_count ?? 0) + total;
+        const correctCount = (existingProgress?.correct_count ?? 0) + score;
+        const recentAccuracy = accuracy;
+
+        const { error: progressWriteError } = await supabase
+          .from("topic_progress")
+          .upsert(
+            {
+              user_id: user.id,
+              learner_subject_id: learnerSubject.id,
+              topic_id: topic.id,
+              mastery: calculation.mastery,
+              recent_accuracy: recentAccuracy,
+              difficulty: session.difficulty,
+              attempted_count: attemptedCount,
+              correct_count: correctCount,
+              last_practiced_at: completedAt,
+            },
+            { onConflict: "user_id,topic_id" },
+          );
+        if (progressWriteError) throw new Error("progress-write");
+
+        setMasterySource("supabase");
+      } catch {
+        setSyncError("Practice finished locally, but Nomi could not save this progress to Supabase yet.");
+      } finally {
+        setSyncing(false);
+      }
     },
-  }), [latestSession, mastery, masterySource, syncing, syncError]);
+  }), [latestSession, mastery, masterySource, syncing, syncError, user]);
 
   return <PracticeProgressContext.Provider value={value}>{children}</PracticeProgressContext.Provider>;
 }
