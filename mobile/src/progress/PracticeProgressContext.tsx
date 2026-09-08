@@ -3,240 +3,26 @@ import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, 
 import { useLearnerSession } from "@/auth/LearnerSessionContext";
 import { supabase } from "@/lib/supabase";
 
-export type PracticeSessionSummary = {
-  topic: string;
-  subject: string;
-  score: number;
-  total: number;
-  accuracy: number;
-  mastery: number;
-  masteryChange: number;
-  completedAt: string;
-};
+export type PracticeSessionSummary = { topic:string; subject:string; score:number; total:number; accuracy:number; mastery:number; masteryChange:number; completedAt:string };
+export type PracticeAttemptInput = { prompt:string; learnerAnswer:string; expectedAnswer:string; isCorrect:boolean };
+export type AdaptivePracticeState = { difficulty:number; intervention:"reinforce"|"standard_practice"|"challenge"|"worked_example"; message:string };
+export type MisconceptionSummary = { category:string; status:"active"|"recurring"|"improving"|"resolved"; occurrenceCount:number; message:string };
+type RecordSessionInput = { topic:string; subject:string; outcomes:boolean[]; attempts:PracticeAttemptInput[]; difficulty:number };
+type MasterySource = "prototype"|"supabase"|"new-learner";
+type PracticeProgressContextValue = { latestSession:PracticeSessionSummary|null; mastery:number; masterySource:MasterySource; adaptivePractice:AdaptivePracticeState; misconception:MisconceptionSummary|null; syncing:boolean; syncError:string|null; recordSession:(session:RecordSessionInput)=>Promise<void> };
 
-export type PracticeAttemptInput = {
-  prompt: string;
-  learnerAnswer: string;
-  expectedAnswer: string;
-  isCorrect: boolean;
-};
+const PracticeProgressContext = createContext<PracticeProgressContextValue|null>(null);
+const PROTOTYPE_STARTING_MASTERY=64;
+const DEFAULT_ADAPTIVE_STATE:AdaptivePracticeState={difficulty:3,intervention:"standard_practice",message:"Nomi is starting with a balanced Factorisation set."};
+function clampRounded(value:number,min:number,max:number){return Math.min(max,Math.max(min,Math.round(value)));}
+function calculateMastery(currentMastery:number,outcomes:boolean[],difficulty:number){let mastery=clampRounded(currentMastery,0,100);const previousMastery=mastery;outcomes.forEach((isCorrect,index)=>{const attemptsBefore=outcomes.slice(Math.max(0,index-8),index);let recentAccuracy=0;if(attemptsBefore.length){let weightedTotal=0,weightSum=0;attemptsBefore.forEach((correct,attemptIndex)=>{const weight=attemptIndex+1;weightedTotal+=(correct?1:0)*weight;weightSum+=weight;});recentAccuracy=weightedTotal/weightSum;}const recencyWeight=.7+((index+1)/outcomes.length)*.3;const delta=(isCorrect?1:-1.2)*(.6+difficulty/10)*(recentAccuracy>=.8?1.1:recentAccuracy>=.5?1:.9)*(isCorrect&&difficulty<=3&&mastery>=70?.45:1)*(!isCorrect&&mastery>=75?.6:1)*recencyWeight*4;mastery=clampRounded(mastery+delta,0,100);});return{mastery,delta:mastery-previousMastery};}
+function deriveAdaptiveState(outcomes:boolean[],currentDifficulty:number,recurring=false):AdaptivePracticeState{if(recurring)return{difficulty:Math.max(1,currentDifficulty-1),intervention:"worked_example",message:"Nomi has seen the same common-factor mistake more than once. The next set will slow down and use a worked-example approach."};if(!outcomes.length)return DEFAULT_ADAPTIVE_STATE;const recent=outcomes.slice(-5);const accuracy=recent.filter(Boolean).length/recent.length;const trailingIncorrect=recent.length>=2&&recent.slice(-2).every(v=>!v);const trailingCorrect=recent.length>=3&&recent.slice(-3).every(Boolean);if(accuracy<=.4||trailingIncorrect)return{difficulty:Math.max(1,currentDifficulty-1),intervention:"reinforce",message:"Nomi noticed repeated misses, so the next set will reinforce the common-factor step with gentler questions."};if(accuracy>=.8&&trailingCorrect)return{difficulty:Math.min(10,currentDifficulty+1),intervention:"challenge",message:"Nomi noticed strong recent accuracy, so the next set will increase the challenge."};return{difficulty:currentDifficulty,intervention:"standard_practice",message:"Nomi will keep the current difficulty while gathering more evidence."};}
 
-export type AdaptivePracticeState = {
-  difficulty: number;
-  intervention: "reinforce" | "standard_practice" | "challenge";
-  message: string;
-};
-
-type RecordSessionInput = {
-  topic: string;
-  subject: string;
-  outcomes: boolean[];
-  attempts: PracticeAttemptInput[];
-  difficulty: number;
-};
-
-type MasterySource = "prototype" | "supabase" | "new-learner";
-
-type PracticeProgressContextValue = {
-  latestSession: PracticeSessionSummary | null;
-  mastery: number;
-  masterySource: MasterySource;
-  adaptivePractice: AdaptivePracticeState;
-  syncing: boolean;
-  syncError: string | null;
-  recordSession: (session: RecordSessionInput) => Promise<void>;
-};
-
-const PracticeProgressContext = createContext<PracticeProgressContextValue | null>(null);
-const PROTOTYPE_STARTING_MASTERY = 64;
-const DEFAULT_ADAPTIVE_STATE: AdaptivePracticeState = {
-  difficulty: 3,
-  intervention: "standard_practice",
-  message: "Nomi is starting with a balanced Factorisation set.",
-};
-
-function clampRounded(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, Math.round(value)));
+export function PracticeProgressProvider({children}:PropsWithChildren){
+ const{user}=useLearnerSession();const[latestSession,setLatestSession]=useState<PracticeSessionSummary|null>(null);const[mastery,setMastery]=useState(PROTOTYPE_STARTING_MASTERY);const[masterySource,setMasterySource]=useState<MasterySource>("prototype");const[adaptivePractice,setAdaptivePractice]=useState<AdaptivePracticeState>(DEFAULT_ADAPTIVE_STATE);const[misconception,setMisconception]=useState<MisconceptionSummary|null>(null);const[syncing,setSyncing]=useState(false);const[syncError,setSyncError]=useState<string|null>(null);
+ useEffect(()=>{if(!user||!supabase){setMastery(PROTOTYPE_STARTING_MASTERY);setMasterySource("prototype");setAdaptivePractice(DEFAULT_ADAPTIVE_STATE);setMisconception(null);setSyncError(null);setSyncing(false);return;}let mounted=true;setSyncing(true);setSyncError(null);async function hydrate(){const{data:topic,error:topicError}=await supabase!.from("topics").select("id").eq("slug","factorisation").maybeSingle();if(!mounted)return;if(topicError||!topic){setSyncError("Could not load the Factorisation topic.");setSyncing(false);return;}const{data:progress,error:progressError}=await supabase!.from("topic_progress").select("id,mastery,difficulty").eq("user_id",user!.id).eq("topic_id",topic.id).maybeSingle();if(!mounted)return;if(progressError){setSyncError("Could not load your learner progress.");setSyncing(false);return;}if(progress){setMastery(clampRounded(Number(progress.mastery),0,100));setMasterySource("supabase");const[{data:recentAttempts},{data:misconceptions}]=await Promise.all([supabase!.from("practice_attempts").select("is_correct").eq("user_id",user!.id).eq("topic_id",topic.id).order("created_at",{ascending:false}).limit(5),supabase!.from("misconception_state").select("category,status,occurrence_count").eq("user_id",user!.id).eq("topic_id",topic.id).neq("status","resolved").order("last_seen_at",{ascending:false}).limit(1)]);const active=misconceptions?.[0];if(active)setMisconception({category:active.category,status:active.status,occurrenceCount:active.occurrence_count,message:active.status==="recurring"?"Nomi has seen this common-factor misunderstanding recur and will intervene more directly.":"Nomi is watching a common-factor misunderstanding from recent practice."});else setMisconception(null);setAdaptivePractice(deriveAdaptiveState((recentAttempts??[]).map(a=>Boolean(a.is_correct)).reverse(),Number(progress.difficulty)||3,active?.status==="recurring"));}else{setMastery(0);setMasterySource("new-learner");setAdaptivePractice(DEFAULT_ADAPTIVE_STATE);setMisconception(null);}setSyncing(false);}void hydrate();return()=>{mounted=false;};},[user]);
+ const value=useMemo<PracticeProgressContextValue>(()=>({latestSession,mastery,masterySource,adaptivePractice,misconception,syncing,syncError,recordSession:async(session)=>{const calculation=calculateMastery(mastery,session.outcomes,session.difficulty);const score=session.outcomes.filter(Boolean).length,total=session.outcomes.length,accuracy=total?Math.round(score/total*100):0,completedAt=new Date().toISOString();setMastery(calculation.mastery);setLatestSession({topic:session.topic,subject:session.subject,score,total,accuracy,mastery:calculation.mastery,masteryChange:calculation.delta,completedAt});if(!user||!supabase)return;setSyncing(true);setSyncError(null);try{const{data:subject}=await supabase.from("subjects").select("id").eq("slug","mathematics").single();if(!subject)throw new Error();const{data:topic}=await supabase.from("topics").select("id").eq("slug","factorisation").eq("subject_id",subject.id).maybeSingle();if(!topic)throw new Error();const{data:learnerSubject}=await supabase.from("learner_subjects").upsert({user_id:user.id,subject_id:subject.id,status:"active"},{onConflict:"user_id,subject_id"}).select("id").single();if(!learnerSubject)throw new Error();const{data:existingProgress}=await supabase.from("topic_progress").select("id,attempted_count,correct_count").eq("user_id",user.id).eq("topic_id",topic.id).maybeSingle();const attemptedCount=(existingProgress?.attempted_count??0)+total,correctCount=(existingProgress?.correct_count??0)+score;const wrongCount=session.attempts.filter(a=>!a.isCorrect).length;let misconceptionStatus:"active"|"recurring"|"improving"|"resolved"|null=null,occurrenceCount=0;if(existingProgress){const{data:existingMis}=await supabase.from("misconception_state").select("occurrence_count,status").eq("user_id",user.id).eq("topic_progress_id",existingProgress.id).eq("concept_name","Factorisation").eq("category","common_factor_selection").maybeSingle();occurrenceCount=(existingMis?.occurrence_count??0)+wrongCount;if(wrongCount>0)misconceptionStatus=occurrenceCount>=2?"recurring":"active";else if(existingMis)misconceptionStatus=existingMis.status==="improving"?"resolved":"improving";}
+ const nextAdaptive=deriveAdaptiveState(session.outcomes,session.difficulty,misconceptionStatus==="recurring");setAdaptivePractice(nextAdaptive);if(misconceptionStatus)setMisconception({category:"common_factor_selection",status:misconceptionStatus,occurrenceCount,message:misconceptionStatus==="recurring"?"Nomi has seen the same common-factor misunderstanding more than once. The next practice will target it directly.":misconceptionStatus==="improving"?"Your recent answers suggest this misunderstanding is improving.":misconceptionStatus==="resolved"?"Recent evidence suggests this misunderstanding is resolved.":"Nomi noticed a possible common-factor misunderstanding and is watching for a pattern."});
+ const{data:progress,error:progressError}=await supabase.from("topic_progress").upsert({user_id:user.id,learner_subject_id:learnerSubject.id,topic_id:topic.id,mastery:calculation.mastery,recent_accuracy:accuracy,difficulty:nextAdaptive.difficulty,attempted_count:attemptedCount,correct_count:correctCount,recommended_intervention:nextAdaptive.intervention,last_practiced_at:completedAt},{onConflict:"user_id,topic_id"}).select("id").single();if(progressError||!progress)throw new Error();const sessionKey=`mobile-${Date.now()}-${Math.random().toString(36).slice(2,10)}`;for(let index=0;index<session.attempts.length;index++){const attempt=session.attempts[index];const key=!attempt.isCorrect?"greatest_common_factor":"";const{error}=await supabase.rpc("persist_practice_result",{p_submission_key:`${sessionKey}-${index+1}`,p_learner_subject_id:learnerSubject.id,p_topic_progress_id:progress.id,p_topic_id:topic.id,p_concept_name:"Factorisation",p_difficulty:session.difficulty,p_question_snapshot:{prompt:attempt.prompt,question_type:"multiple_choice",source:"mobile_native"},p_expected_answer:{accepted:[attempt.expectedAnswer]},p_learner_answer:{value:attempt.learnerAnswer},p_is_correct:attempt.isCorrect,p_response_time_ms:null,p_misconception_key:key||null,p_misconception_category:attempt.isCorrect?null:"common_factor_selection",p_misconception_status:attempt.isCorrect?null:misconceptionStatus,p_misconception_occurrence_count:attempt.isCorrect?null:occurrenceCount,p_misconception_evidence_summary:attempt.isCorrect?null:"Learner selected an option that did not extract the greatest common factor.",p_subject_name_snapshot:session.subject,p_topic_name_snapshot:session.topic,p_learning_session_id:null,p_mastery:calculation.mastery,p_recent_accuracy:accuracy,p_next_difficulty:nextAdaptive.difficulty,p_attempted_count:attemptedCount,p_correct_count:correctCount,p_consecutive_correct:0,p_consecutive_incorrect:0,p_recommended_intervention:nextAdaptive.intervention});if(error)throw new Error("attempt-persist");}setMasterySource("supabase");}catch{setSyncError("Practice finished locally, but Nomi could not save all learner evidence to Supabase yet.");}finally{setSyncing(false);}}}),[latestSession,mastery,masterySource,adaptivePractice,misconception,syncing,syncError,user]);return <PracticeProgressContext.Provider value={value}>{children}</PracticeProgressContext.Provider>;
 }
-
-function calculateMastery(currentMastery: number, outcomes: boolean[], difficulty: number) {
-  let mastery = clampRounded(currentMastery, 0, 100);
-  const previousMastery = mastery;
-
-  outcomes.forEach((isCorrect, index) => {
-    const attemptsBefore = outcomes.slice(Math.max(0, index - 8), index);
-    let recentAccuracy = 0;
-    if (attemptsBefore.length > 0) {
-      let weightedTotal = 0;
-      let weightSum = 0;
-      attemptsBefore.forEach((correct, attemptIndex) => {
-        const weight = attemptIndex + 1;
-        weightedTotal += (correct ? 1 : 0) * weight;
-        weightSum += weight;
-      });
-      recentAccuracy = weightedTotal / weightSum;
-    }
-
-    const recencyWeight = 0.7 + ((index + 1) / outcomes.length) * 0.3;
-    const correctnessSign = isCorrect ? 1 : -1.2;
-    const difficultyWeight = 0.6 + difficulty / 10;
-    const performanceWeight = recentAccuracy >= 0.8 ? 1.1 : recentAccuracy >= 0.5 ? 1 : 0.9;
-    const easyRepeatWeight = isCorrect && difficulty <= 3 && mastery >= 70 ? 0.45 : 1;
-    const mistakeProtectionWeight = !isCorrect && mastery >= 75 ? 0.6 : 1;
-    const delta = correctnessSign * difficultyWeight * performanceWeight * easyRepeatWeight * mistakeProtectionWeight * recencyWeight * 4;
-    mastery = clampRounded(mastery + delta, 0, 100);
-  });
-
-  return { mastery, delta: mastery - previousMastery };
-}
-
-function deriveAdaptiveState(outcomes: boolean[], currentDifficulty: number): AdaptivePracticeState {
-  if (outcomes.length === 0) return DEFAULT_ADAPTIVE_STATE;
-  const recent = outcomes.slice(-5);
-  const accuracy = recent.filter(Boolean).length / recent.length;
-  const trailingIncorrect = recent.slice(-2).every((value) => !value);
-  const trailingCorrect = recent.slice(-3).every(Boolean);
-
-  if (accuracy <= 0.4 || trailingIncorrect) {
-    return {
-      difficulty: Math.max(1, currentDifficulty - 1),
-      intervention: "reinforce",
-      message: "Nomi noticed repeated misses, so the next set will reinforce the common-factor step with gentler questions.",
-    };
-  }
-  if (accuracy >= 0.8 && trailingCorrect) {
-    return {
-      difficulty: Math.min(10, currentDifficulty + 1),
-      intervention: "challenge",
-      message: "Nomi noticed strong recent accuracy, so the next set will increase the challenge.",
-    };
-  }
-  return {
-    difficulty: currentDifficulty,
-    intervention: "standard_practice",
-    message: "Nomi will keep the current difficulty while gathering more evidence.",
-  };
-}
-
-export function PracticeProgressProvider({ children }: PropsWithChildren) {
-  const { user } = useLearnerSession();
-  const [latestSession, setLatestSession] = useState<PracticeSessionSummary | null>(null);
-  const [mastery, setMastery] = useState(PROTOTYPE_STARTING_MASTERY);
-  const [masterySource, setMasterySource] = useState<MasterySource>("prototype");
-  const [adaptivePractice, setAdaptivePractice] = useState<AdaptivePracticeState>(DEFAULT_ADAPTIVE_STATE);
-  const [syncing, setSyncing] = useState(false);
-  const [syncError, setSyncError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user || !supabase) {
-      setMastery(PROTOTYPE_STARTING_MASTERY);
-      setMasterySource("prototype");
-      setAdaptivePractice(DEFAULT_ADAPTIVE_STATE);
-      setSyncError(null);
-      setSyncing(false);
-      return;
-    }
-
-    let mounted = true;
-    setSyncing(true);
-    setSyncError(null);
-
-    async function hydrateMastery() {
-      const { data: topic, error: topicError } = await supabase.from("topics").select("id").eq("slug", "factorisation").maybeSingle();
-      if (!mounted) return;
-      if (topicError || !topic) {
-        setSyncError(topicError ? "Could not load the Factorisation topic." : "Factorisation is not available in the synced curriculum yet.");
-        setSyncing(false);
-        return;
-      }
-
-      const { data: progress, error: progressError } = await supabase
-        .from("topic_progress").select("mastery,difficulty").eq("user_id", user.id).eq("topic_id", topic.id).maybeSingle();
-      if (!mounted) return;
-      if (progressError) {
-        setSyncError("Could not load your learner progress.");
-        setSyncing(false);
-        return;
-      }
-
-      if (progress) {
-        setMastery(clampRounded(Number(progress.mastery), 0, 100));
-        setMasterySource("supabase");
-        const { data: recentAttempts } = await supabase
-          .from("practice_attempts").select("is_correct").eq("user_id", user.id).eq("topic_id", topic.id).order("created_at", { ascending: false }).limit(5);
-        const chronological = (recentAttempts ?? []).map((attempt) => Boolean(attempt.is_correct)).reverse();
-        setAdaptivePractice(deriveAdaptiveState(chronological, Number(progress.difficulty) || 3));
-      } else {
-        setMastery(0);
-        setMasterySource("new-learner");
-        setAdaptivePractice(DEFAULT_ADAPTIVE_STATE);
-      }
-      setSyncing(false);
-    }
-
-    void hydrateMastery();
-    return () => { mounted = false; };
-  }, [user]);
-
-  const value = useMemo<PracticeProgressContextValue>(() => ({
-    latestSession, mastery, masterySource, adaptivePractice, syncing, syncError,
-    recordSession: async (session) => {
-      const calculation = calculateMastery(mastery, session.outcomes, session.difficulty);
-      const score = session.outcomes.filter(Boolean).length;
-      const total = session.outcomes.length;
-      const accuracy = total > 0 ? Math.round((score / total) * 100) : 0;
-      const completedAt = new Date().toISOString();
-      const nextAdaptiveState = deriveAdaptiveState(session.outcomes, session.difficulty);
-
-      setMastery(calculation.mastery);
-      setAdaptivePractice(nextAdaptiveState);
-      setLatestSession({ topic: session.topic, subject: session.subject, score, total, accuracy, mastery: calculation.mastery, masteryChange: calculation.delta, completedAt });
-      if (!user || !supabase) return;
-      setSyncing(true); setSyncError(null);
-
-      try {
-        const { data: subject, error: subjectError } = await supabase.from("subjects").select("id").eq("slug", "mathematics").single();
-        if (subjectError || !subject) throw new Error("subject");
-        const { data: topic, error: topicError } = await supabase.from("topics").select("id").eq("slug", "factorisation").eq("subject_id", subject.id).maybeSingle();
-        if (topicError || !topic) throw new Error("topic");
-        const { data: learnerSubject, error: learnerSubjectError } = await supabase.from("learner_subjects").upsert({ user_id: user.id, subject_id: subject.id, status: "active" }, { onConflict: "user_id,subject_id" }).select("id").single();
-        if (learnerSubjectError || !learnerSubject) throw new Error("learner-subject");
-        const { data: existingProgress, error: existingProgressError } = await supabase.from("topic_progress").select("id,attempted_count,correct_count").eq("user_id", user.id).eq("topic_id", topic.id).maybeSingle();
-        if (existingProgressError) throw new Error("progress-read");
-
-        const attemptedCount = (existingProgress?.attempted_count ?? 0) + total;
-        const correctCount = (existingProgress?.correct_count ?? 0) + score;
-        const { data: progress, error: progressWriteError } = await supabase.from("topic_progress").upsert({
-          user_id: user.id, learner_subject_id: learnerSubject.id, topic_id: topic.id, mastery: calculation.mastery,
-          recent_accuracy: accuracy, difficulty: nextAdaptiveState.difficulty, attempted_count: attemptedCount, correct_count: correctCount,
-          recommended_intervention: nextAdaptiveState.intervention, last_practiced_at: completedAt,
-        }, { onConflict: "user_id,topic_id" }).select("id").single();
-        if (progressWriteError || !progress) throw new Error("progress-write");
-
-        const sessionKey = `mobile-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-        const attemptRows = session.attempts.map((attempt, index) => ({
-          user_id: user.id, topic_progress_id: progress.id, topic_id: topic.id, concept_name: "Factorisation", difficulty: session.difficulty,
-          question_snapshot: { prompt: attempt.prompt, question_type: "multiple_choice", source: "mobile_native" },
-          expected_answer: { accepted: [attempt.expectedAnswer] }, learner_answer: { value: attempt.learnerAnswer }, is_correct: attempt.isCorrect,
-          response_time_ms: null, misconception_category: attempt.isCorrect ? null : "conceptual_understanding",
-          subject_name_snapshot: session.subject, topic_name_snapshot: session.topic, learning_session_id: null, submission_key: `${sessionKey}-${index + 1}`,
-        }));
-        if (attemptRows.length > 0) {
-          const { error: attemptsWriteError } = await supabase.from("practice_attempts").insert(attemptRows);
-          if (attemptsWriteError) throw new Error("attempts-write");
-        }
-        setMasterySource("supabase");
-      } catch {
-        setSyncError("Practice finished locally, but Nomi could not save all learner evidence to Supabase yet.");
-      } finally { setSyncing(false); }
-    },
-  }), [latestSession, mastery, masterySource, adaptivePractice, syncing, syncError, user]);
-
-  return <PracticeProgressContext.Provider value={value}>{children}</PracticeProgressContext.Provider>;
-}
-
-export function usePracticeProgress() {
-  const context = useContext(PracticeProgressContext);
-  if (!context) throw new Error("usePracticeProgress must be used within PracticeProgressProvider");
-  return context;
-}
+export function usePracticeProgress(){const context=useContext(PracticeProgressContext);if(!context)throw new Error("usePracticeProgress must be used within PracticeProgressProvider");return context;}
