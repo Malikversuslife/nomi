@@ -54,7 +54,9 @@ export default function PracticeScreen() {
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [outcomes, setOutcomes] = useState<boolean[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]);
   const [complete, setComplete] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const question = questions[questionIndex];
   const isCorrect = checked && selected === question.correctAnswer;
@@ -65,24 +67,33 @@ export default function PracticeScreen() {
     return isCorrect ? `${mascotBase}/encouraging.png` : `${mascotBase}/supportive.png`;
   }, [checked, complete, isCorrect]);
 
-  function handlePrimaryAction() {
-    if (!selected) return;
+  async function handlePrimaryAction() {
+    if (!selected || saving) return;
 
     if (!checked) {
       const correct = selected === question.correctAnswer;
       if (correct) setScore((current) => current + 1);
       setOutcomes((current) => [...current, correct]);
+      setAnswers((current) => [...current, selected]);
       setChecked(true);
       return;
     }
 
     if (questionIndex === questions.length - 1) {
-      recordSession({
+      setSaving(true);
+      await recordSession({
         subject: "Mathematics",
         topic: "Factorisation",
         outcomes,
         difficulty: 3,
+        attempts: questions.map((item, index) => ({
+          prompt: `Factorise completely: ${item.expression}`,
+          learnerAnswer: answers[index] ?? "",
+          expectedAnswer: item.correctAnswer,
+          isCorrect: outcomes[index] ?? false,
+        })),
       });
+      setSaving(false);
       setComplete(true);
       return;
     }
@@ -98,7 +109,9 @@ export default function PracticeScreen() {
     setChecked(false);
     setScore(0);
     setOutcomes([]);
+    setAnswers([]);
     setComplete(false);
+    setSaving(false);
   }
 
   if (complete) {
@@ -110,7 +123,7 @@ export default function PracticeScreen() {
           <Text style={styles.completionTitle}>Nice work. You finished the set.</Text>
           <Text style={styles.completionScore}>{score} / {questions.length} correct</Text>
           <Text style={styles.completionBody}>
-            Your ordered attempts have now been evaluated by Nomi's deterministic mastery engine.
+            Nomi saved this session as learner evidence, including each question, answer, and outcome.
           </Text>
           <Pressable style={[styles.button, styles.completionButton]} onPress={restartSession} accessibilityRole="button">
             <Text style={styles.buttonText}>Practice again</Text>
@@ -171,11 +184,13 @@ export default function PracticeScreen() {
 
         <Pressable
           accessibilityRole="button"
-          disabled={!selected}
-          onPress={handlePrimaryAction}
-          style={[styles.button, !selected && styles.buttonDisabled]}
+          disabled={!selected || saving}
+          onPress={() => void handlePrimaryAction()}
+          style={[styles.button, (!selected || saving) && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>{checked ? (questionIndex === questions.length - 1 ? "Finish practice" : "Next question") : "Check answer"}</Text>
+          <Text style={styles.buttonText}>
+            {saving ? "Saving progress..." : checked ? (questionIndex === questions.length - 1 ? "Finish practice" : "Next question") : "Check answer"}
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
