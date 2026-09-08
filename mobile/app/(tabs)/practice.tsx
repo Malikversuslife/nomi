@@ -100,7 +100,7 @@ export default function PracticeScreen() {
           <Text style={styles.completionBody}>
             Nomi will use this session to decide what to reinforce and how challenging the next set should be.
           </Text>
-          <Pressable style={styles.button} onPress={restartSession} accessibilityRole="button">
+          <Pressable style={[styles.button, styles.completionButton]} onPress={restartSession} accessibilityRole="button">
             <Text style={styles.buttonText}>Practice again</Text>
           </Pressable>
         </View>
@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
   feedbackTitle: { color: colors.ink, fontSize: 16, fontWeight: "800", lineHeight: 21, marginTop: 5 },
   feedbackBody: { color: colors.slate, fontSize: 13, lineHeight: 19, marginTop: 4 },
   button: { alignItems: "center", backgroundColor: colors.primaryPurple, borderRadius: radius.pill, marginTop: "auto", paddingVertical: 16 },
+  completionButton: { alignSelf: "stretch", marginTop: spacing.xl },
   buttonDisabled: { opacity: 0.35 },
   buttonText: { color: colors.white, fontSize: 16, fontWeight: "800" },
   completionScreen: { flex: 1, alignItems: "center", justifyContent: "center", padding: spacing.xl },
