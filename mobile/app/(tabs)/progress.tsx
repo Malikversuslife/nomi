@@ -7,9 +7,17 @@ import { colors, radius, spacing } from "@/theme/tokens";
 
 export default function ProgressScreen() {
   const { configured, loading, user, displayName, error, signIn, signOut } = useLearnerSession();
-  const { latestSession, mastery, masterySource, syncing } = usePracticeProgress();
+  const { latestSession, mastery, masterySource, syncing, syncError } = usePracticeProgress();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const sourceLabel = syncing
+    ? "Syncing learner data"
+    : masterySource === "supabase"
+      ? "Live learner data"
+      : masterySource === "new-learner"
+        ? "No practice recorded yet"
+        : "Prototype state";
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -52,9 +60,16 @@ export default function ProgressScreen() {
           </View>
           <View style={styles.masteryMeta}>
             <Text style={styles.masteryScale}>/ 100</Text>
-            <Text style={styles.source}>{masterySource === "supabase" ? "Live learner data" : "Prototype state"}</Text>
+            <Text style={styles.source}>{sourceLabel}</Text>
           </View>
         </View>
+
+        {syncError ? (
+          <View style={styles.noticeCard}>
+            <Text style={styles.noticeTitle}>Progress sync needs attention</Text>
+            <Text style={styles.noticeBody}>{syncError}</Text>
+          </View>
+        ) : null}
 
         {latestSession ? (
           <View style={styles.card}>
@@ -97,6 +112,9 @@ const styles = StyleSheet.create({
   masteryMeta: { alignItems: "flex-end", paddingBottom: 4 },
   masteryScale: { color: colors.slate, fontSize: 16, fontWeight: "700" },
   source: { color: colors.primaryPurple, fontSize: 10, fontWeight: "800", marginTop: 4 },
+  noticeCard: { backgroundColor: colors.white, borderRadius: radius.lg, marginTop: spacing.md, padding: spacing.lg },
+  noticeTitle: { color: colors.ink, fontSize: 14, fontWeight: "800" },
+  noticeBody: { color: colors.slate, fontSize: 13, lineHeight: 19, marginTop: spacing.xs },
   card: { backgroundColor: colors.white, borderRadius: radius.lg, marginTop: spacing.md, padding: spacing.lg },
   cardHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
   subject: { color: colors.primaryPurple, fontSize: 12, fontWeight: "800" },
