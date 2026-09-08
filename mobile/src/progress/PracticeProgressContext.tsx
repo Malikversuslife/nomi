@@ -21,11 +21,14 @@ type RecordSessionInput = {
   difficulty: number;
 };
 
+type MasterySource = "prototype" | "supabase" | "new-learner";
+
 type PracticeProgressContextValue = {
   latestSession: PracticeSessionSummary | null;
   mastery: number;
-  masterySource: "prototype" | "supabase";
+  masterySource: MasterySource;
   syncing: boolean;
+  syncError: string | null;
   recordSession: (session: RecordSessionInput) => void;
 };
 
@@ -71,32 +74,43 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
   const { user } = useLearnerSession();
   const [latestSession, setLatestSession] = useState<PracticeSessionSummary | null>(null);
   const [mastery, setMastery] = useState(PROTOTYPE_STARTING_MASTERY);
-  const [masterySource, setMasterySource] = useState<"prototype" | "supabase">("prototype");
+  const [masterySource, setMasterySource] = useState<MasterySource>("prototype");
   const [syncing, setSyncing] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !supabase) {
       setMastery(PROTOTYPE_STARTING_MASTERY);
       setMasterySource("prototype");
+      setSyncError(null);
+      setSyncing(false);
       return;
     }
 
     let mounted = true;
     setSyncing(true);
+    setSyncError(null);
 
     async function hydrateMastery() {
-      const { data: topic } = await supabase
+      const { data: topic, error: topicError } = await supabase
         .from("topics")
         .select("id")
         .eq("slug", "factorisation")
         .maybeSingle();
 
+      if (!mounted) return;
+      if (topicError) {
+        setSyncError("Could not load the Factorisation topic.");
+        setSyncing(false);
+        return;
+      }
       if (!topic) {
-        if (mounted) setSyncing(false);
+        setSyncError("Factorisation is not available in the synced curriculum yet.");
+        setSyncing(false);
         return;
       }
 
-      const { data: progress } = await supabase
+      const { data: progress, error: progressError } = await supabase
         .from("topic_progress")
         .select("mastery")
         .eq("user_id", user.id)
@@ -104,9 +118,18 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
         .maybeSingle();
 
       if (!mounted) return;
+      if (progressError) {
+        setSyncError("Could not load your learner progress.");
+        setSyncing(false);
+        return;
+      }
+
       if (progress) {
-        setMastery(progress.mastery);
+        setMastery(clampRounded(Number(progress.mastery), 0, 100));
         setMasterySource("supabase");
+      } else {
+        setMastery(0);
+        setMasterySource("new-learner");
       }
       setSyncing(false);
     }
@@ -120,6 +143,7 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
     mastery,
     masterySource,
     syncing,
+    syncError,
     recordSession: (session) => {
       const calculation = calculateMastery(mastery, session.outcomes, session.difficulty);
       const score = session.outcomes.filter(Boolean).length;
@@ -138,7 +162,7 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
         completedAt: new Date().toISOString(),
       });
     },
-  }), [latestSession, mastery, masterySource, syncing]);
+  }), [latestSession, mastery, masterySource, syncing, syncError]);
 
   return <PracticeProgressContext.Provider value={value}>{children}</PracticeProgressContext.Provider>;
 }
