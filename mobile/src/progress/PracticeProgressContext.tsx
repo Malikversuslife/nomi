@@ -1,4 +1,7 @@
-import { createContext, type PropsWithChildren, useContext, useMemo, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
+
+import { useLearnerSession } from "@/auth/LearnerSessionContext";
+import { supabase } from "@/lib/supabase";
 
 export type PracticeSessionSummary = {
   topic: string;
@@ -21,6 +24,8 @@ type RecordSessionInput = {
 type PracticeProgressContextValue = {
   latestSession: PracticeSessionSummary | null;
   mastery: number;
+  masterySource: "prototype" | "supabase";
+  syncing: boolean;
   recordSession: (session: RecordSessionInput) => void;
 };
 
@@ -38,7 +43,6 @@ function calculateMastery(currentMastery: number, outcomes: boolean[], difficult
   outcomes.forEach((isCorrect, index) => {
     const attemptsBefore = outcomes.slice(Math.max(0, index - 8), index);
     let recentAccuracy = 0;
-
     if (attemptsBefore.length > 0) {
       let weightedTotal = 0;
       let weightSum = 0;
@@ -57,7 +61,6 @@ function calculateMastery(currentMastery: number, outcomes: boolean[], difficult
     const easyRepeatWeight = isCorrect && difficulty <= 3 && mastery >= 70 ? 0.45 : 1;
     const mistakeProtectionWeight = !isCorrect && mastery >= 75 ? 0.6 : 1;
     const delta = correctnessSign * difficultyWeight * performanceWeight * easyRepeatWeight * mistakeProtectionWeight * recencyWeight * 4;
-
     mastery = clampRounded(mastery + delta, 0, 100);
   });
 
@@ -65,12 +68,58 @@ function calculateMastery(currentMastery: number, outcomes: boolean[], difficult
 }
 
 export function PracticeProgressProvider({ children }: PropsWithChildren) {
+  const { user } = useLearnerSession();
   const [latestSession, setLatestSession] = useState<PracticeSessionSummary | null>(null);
   const [mastery, setMastery] = useState(PROTOTYPE_STARTING_MASTERY);
+  const [masterySource, setMasterySource] = useState<"prototype" | "supabase">("prototype");
+  const [syncing, setSyncing] = useState(false);
+
+  useEffect(() => {
+    if (!user || !supabase) {
+      setMastery(PROTOTYPE_STARTING_MASTERY);
+      setMasterySource("prototype");
+      return;
+    }
+
+    let mounted = true;
+    setSyncing(true);
+
+    async function hydrateMastery() {
+      const { data: topic } = await supabase
+        .from("topics")
+        .select("id")
+        .eq("slug", "factorisation")
+        .maybeSingle();
+
+      if (!topic) {
+        if (mounted) setSyncing(false);
+        return;
+      }
+
+      const { data: progress } = await supabase
+        .from("topic_progress")
+        .select("mastery")
+        .eq("user_id", user.id)
+        .eq("topic_id", topic.id)
+        .maybeSingle();
+
+      if (!mounted) return;
+      if (progress) {
+        setMastery(progress.mastery);
+        setMasterySource("supabase");
+      }
+      setSyncing(false);
+    }
+
+    void hydrateMastery();
+    return () => { mounted = false; };
+  }, [user]);
 
   const value = useMemo<PracticeProgressContextValue>(() => ({
     latestSession,
     mastery,
+    masterySource,
+    syncing,
     recordSession: (session) => {
       const calculation = calculateMastery(mastery, session.outcomes, session.difficulty);
       const score = session.outcomes.filter(Boolean).length;
@@ -89,15 +138,13 @@ export function PracticeProgressProvider({ children }: PropsWithChildren) {
         completedAt: new Date().toISOString(),
       });
     },
-  }), [latestSession, mastery]);
+  }), [latestSession, mastery, masterySource, syncing]);
 
   return <PracticeProgressContext.Provider value={value}>{children}</PracticeProgressContext.Provider>;
 }
 
 export function usePracticeProgress() {
   const context = useContext(PracticeProgressContext);
-  if (!context) {
-    throw new Error("usePracticeProgress must be used within PracticeProgressProvider");
-  }
+  if (!context) throw new Error("usePracticeProgress must be used within PracticeProgressProvider");
   return context;
 }
