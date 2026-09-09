@@ -36,7 +36,7 @@ export default function NomiScreen(){
   async function getTutorResponse(message:string,currentMessages:TutorMessage[]):Promise<TutorResult>{
     if(tutorApiBase&&supabase){
       const{data}=await supabase.auth.getSession();const accessToken=data.session?.access_token;
-      if(accessToken){try{const response=await fetch(`${tutorApiBase}/api/mobile/tutor`,{method:"POST",headers:{authorization:`Bearer ${accessToken}`,"content-type":"application/json"},body:JSON.stringify({message,transcript:currentMessages.slice(-12).map(item=>({role:item.role,content:item.content}))})});const payload=await response.json() as {ok?:boolean;message?:string;followUp?:string|null;suggestedAction?:TutorAction};if(response.ok&&payload.ok&&payload.message){setAiMode("server");return{content:payload.message,followUp:payload.followUp,suggestedAction:payload.suggestedAction};}}catch{}}
+      if(accessToken){try{const response=await fetch(`${tutorApiBase}/api/mobile/tutor`,{method:"POST",headers:{authorization:`Bearer ${accessToken}`,"content-type":"application/json"},body:JSON.stringify({message,transcript:currentMessages.slice(-12).map(item=>({role:item.role,content:item.role==="assistant"&&item.followUp?`${item.content}\n\nTutor follow-up question: ${item.followUp}`:item.content}))})});const payload=await response.json() as {ok?:boolean;message?:string;followUp?:string|null;suggestedAction?:TutorAction};if(response.ok&&payload.ok&&payload.message){setAiMode("server");return{content:payload.message,followUp:payload.followUp,suggestedAction:payload.suggestedAction};}}catch{}}
     }
     setAiMode("fallback");return tutorReply(message,mastery,adaptivePractice.difficulty,misconception);
   }
