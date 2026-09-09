@@ -66,8 +66,7 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
     subjectName,
     topicName: topicResult.data?.name ?? null,
     gradeYear: profile?.grade_year ?? null,
-    explanationStyle:
-      progress.preferred_explanation_style ?? profile?.preferred_explanation_style ?? null,
+    explanationStyle: progress.preferred_explanation_style ?? profile?.preferred_explanation_style ?? null,
     intervention: progress.recommended_intervention,
     misconceptionCategory: misconceptionResult.data?.category ?? null,
     misconceptionStatus: misconceptionResult.data?.status ?? null,
@@ -75,6 +74,8 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
       attemptResult.data && typeof attemptResult.data.is_correct === "boolean"
         ? attemptResult.data.is_correct
         : null,
+    mastery: typeof progress.mastery === "number" ? progress.mastery : Number(progress.mastery),
+    difficulty: typeof progress.difficulty === "number" ? progress.difficulty : Number(progress.difficulty),
   };
 
   const topicName = input.topicName;
