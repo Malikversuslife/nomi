@@ -14,6 +14,7 @@ export async function generateTutorResponse(input: {
   const provider = input.provider ?? getConfiguredAiProvider();
 
   if (!provider) {
+    console.error("tutor_ai_unavailable", { reason: "provider_not_configured" });
     return null;
   }
 
@@ -24,17 +25,29 @@ export async function generateTutorResponse(input: {
     { prompt: tutorUserPrompt({ transcript: bounded, message: input.message, correction: true }) },
   ];
 
-  for (const attempt of attempts) {
+  for (let index = 0; index < attempts.length; index += 1) {
+    const attempt = attempts[index];
     try {
       const raw = await provider.generateJson({ system, prompt: attempt.prompt });
       const parsed = tutorResponseSchema.safeParse(raw);
 
       if (!parsed.success) {
+        console.error("tutor_ai_unavailable", {
+          reason: "schema_validation_failed",
+          attempt: index + 1,
+          issues: parsed.error.issues.map((issue) => ({ path: issue.path.join("."), code: issue.code })),
+        });
         continue;
       }
 
       return toTutorResponse(parsed.data);
-    } catch {
+    } catch (error) {
+      console.error("tutor_ai_unavailable", {
+        reason: "provider_error",
+        attempt: index + 1,
+        name: error instanceof Error ? error.name : "UnknownError",
+        message: error instanceof Error ? error.message : String(error),
+      });
       continue;
     }
   }
