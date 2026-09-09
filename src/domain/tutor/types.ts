@@ -28,6 +28,8 @@ export type TutorContextInput = {
   misconceptionCategory?: string | null;
   misconceptionStatus?: string | null;
   recentPracticeCorrect?: boolean | null;
+  mastery?: number | null;
+  difficulty?: number | null;
 };
 
 export type TutorConversationTurn = {
