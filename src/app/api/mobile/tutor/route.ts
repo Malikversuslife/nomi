@@ -54,7 +54,11 @@ export async function POST(request: Request) {
       followUp: response.followUp ?? null,
       context: context.client,
     });
-  } catch {
+  } catch (error) {
+    console.error("mobile_tutor_failed", {
+      name: error instanceof Error ? error.name : "UnknownError",
+      message: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json({ ok: false, error: "failed" }, { status: 500 });
   }
 }
