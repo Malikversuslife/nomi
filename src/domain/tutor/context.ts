@@ -59,23 +59,15 @@ export function emptyStateContextLine(context: TutorClientContext): string | nul
 export function buildTutorContextText(input: TutorContextInput): string {
   const rows: string[] = [];
 
-  if (input.subjectName) {
-    rows.push(`Subject: ${input.subjectName}`);
-  }
-  if (input.topicName) {
-    rows.push(`Topic: ${input.topicName}`);
-  }
-  if (input.gradeYear) {
-    rows.push(`Learner grade/year: ${input.gradeYear}`);
-  }
-  if (input.explanationStyle) {
-    rows.push(`Preferred explanation style: ${input.explanationStyle}`);
-  }
+  if (input.subjectName) rows.push(`Subject: ${input.subjectName}`);
+  if (input.topicName) rows.push(`Topic: ${input.topicName}`);
+  if (input.gradeYear) rows.push(`Learner grade/year: ${input.gradeYear}`);
+  if (input.explanationStyle) rows.push(`Preferred explanation style: ${input.explanationStyle}`);
+  if (typeof input.mastery === "number") rows.push(`Current mastery: ${Math.round(input.mastery)}/100.`);
+  if (typeof input.difficulty === "number") rows.push(`Current practice difficulty: ${Math.round(input.difficulty)}/10.`);
 
   const intervention = interventionContextPhrase(input.intervention);
-  if (intervention) {
-    rows.push(`Recent learner state: ${intervention}.`);
-  }
+  if (intervention) rows.push(`Recent learner state: ${intervention}.`);
 
   if (input.recentPracticeCorrect === true) {
     rows.push("Recent practice result: the last answer was marked correct.");
@@ -83,13 +75,8 @@ export function buildTutorContextText(input: TutorContextInput): string {
     rows.push("Recent practice result: the last answer was marked incorrect.");
   }
 
-  const misconception = misconceptionContextPhrase(
-    input.misconceptionCategory,
-    input.misconceptionStatus,
-  );
-  if (misconception) {
-    rows.push(`Learner misconception note: ${misconception}.`);
-  }
+  const misconception = misconceptionContextPhrase(input.misconceptionCategory, input.misconceptionStatus);
+  if (misconception) rows.push(`Learner misconception note: ${misconception}.`);
 
   return rows.join("\n");
 }
