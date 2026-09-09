@@ -1,6 +1,5 @@
 import "server-only";
-import { createServerSupabaseClient } from "@/server/supabase/server";
-import { getProfile } from "@/server/data/learner";
+import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import type { TutorClientContext, TutorContextInput } from "@/domain/tutor/types";
 
 export type TutorServerContext = {
@@ -11,15 +10,22 @@ export type TutorServerContext = {
 };
 
 export async function buildTutorContext(userId: string): Promise<TutorServerContext> {
-  const supabase = await createServerSupabaseClient();
+  // Mobile tutor requests authenticate with a Bearer token rather than the web
+  // app's cookie session. Use the service-role client only after the route has
+  // verified that token, then scope every learner query explicitly to userId.
+  const supabase = createSupabaseAdminClient();
 
-  const { data: progress } = await supabase
+  const { data: progress, error: progressError } = await supabase
     .from("topic_progress")
     .select("*")
     .eq("user_id", userId)
     .order("updated_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  if (progressError) {
+    throw new Error(`Unable to load tutor progress: ${progressError.message}`);
+  }
 
   if (!progress) {
     return {
@@ -30,7 +36,7 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
     };
   }
 
-  const [topicResult, attemptResult, misconceptionResult, profile] = await Promise.all([
+  const [topicResult, attemptResult, misconceptionResult, profileResult] = await Promise.all([
     supabase.from("topics").select("*").eq("id", progress.topic_id).maybeSingle(),
     supabase
       .from("practice_attempts")
@@ -48,17 +54,24 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
       .order("last_seen_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    getProfile(userId),
+    supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
   ]);
 
+  if (topicResult.error) throw new Error(`Unable to load tutor topic: ${topicResult.error.message}`);
+  if (attemptResult.error) throw new Error(`Unable to load tutor attempt: ${attemptResult.error.message}`);
+  if (misconceptionResult.error) throw new Error(`Unable to load tutor misconception: ${misconceptionResult.error.message}`);
+  if (profileResult.error) throw new Error(`Unable to load tutor profile: ${profileResult.error.message}`);
+
+  const profile = profileResult.data;
   let subjectName: string | null = null;
 
   if (topicResult.data) {
-    const { data: subject } = await supabase
+    const { data: subject, error: subjectError } = await supabase
       .from("subjects")
       .select("name")
       .eq("id", topicResult.data.subject_id)
       .maybeSingle();
+    if (subjectError) throw new Error(`Unable to load tutor subject: ${subjectError.message}`);
     subjectName = subject?.name ?? null;
   }
 
