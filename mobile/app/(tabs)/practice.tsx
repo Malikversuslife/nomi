@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useCurriculum } from "@/learn/useCurriculum";
@@ -10,9 +10,10 @@ import { colors, radius, spacing } from "@/theme/tokens";
 const mascotBase = "https://raw.githubusercontent.com/Malikversuslife/nomi/main/public/brand/nomi/mascot";
 
 export default function PracticeScreen() {
+  const router=useRouter();
   const params=useLocalSearchParams<{topicId?:string;topicSlug?:string;topicName?:string;subjectId?:string;subjectName?:string}>();
   const {subject,currentTopic,loading:curriculumLoading,error:curriculumError}=useCurriculum("mathematics");
-  const { recordSession, adaptivePractice } = usePracticeProgress();
+  const { recordSession, adaptivePractice, setActiveTopic, latestSession } = usePracticeProgress();
   const topicId=params.topicId??currentTopic?.id??null;
   const topicName=params.topicName??currentTopic?.name??"Practice";
   const subjectId=params.subjectId??subject?.id??null;
@@ -29,6 +30,7 @@ export default function PracticeScreen() {
   const [complete, setComplete] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  useEffect(()=>{setActiveTopic(topicId,topicName);},[setActiveTopic,topicId,topicName]);
   useEffect(()=>{setQuestionIndex(0);setSelected(null);setTextAnswer("");setChecked(false);setScore(0);setOutcomes([]);setAnswers([]);setComplete(false);},[topicId]);
 
   const question=questions[questionIndex];
@@ -36,6 +38,8 @@ export default function PracticeScreen() {
   const isCorrect=Boolean(checked&&question&&isAcceptedAnswer(question,learnerAnswer));
   const progress=questions.length?`${((questionIndex+1)/questions.length)*100}%` as const:"0%" as const;
   const mascotUri = useMemo(() => complete ? `${mascotBase}/celebrating.png` : !checked ? `${mascotBase}/thinking.png` : isCorrect ? `${mascotBase}/encouraging.png` : `${mascotBase}/supportive.png`, [checked, complete, isCorrect]);
+  const completedMastery=latestSession?.topic===topicName?latestSession.mastery:null;
+  const topicMastered=completedMastery!==null&&completedMastery>=80;
 
   async function handlePrimaryAction() {
     if (!question || !learnerAnswer.trim() || saving) return;
@@ -66,10 +70,11 @@ export default function PracticeScreen() {
   if (complete) return (
     <SafeAreaView style={styles.safeArea}><View style={styles.completionScreen}>
       <Image source={{ uri: mascotUri }} style={styles.completionMascot} resizeMode="contain" />
-      <Text style={styles.completionEyebrow}>PRACTICE COMPLETE</Text><Text style={styles.completionTitle}>Nice work. You finished {topicName}.</Text>
-      <Text style={styles.completionScore}>{score} / {questions.length} correct</Text>
-      <View style={styles.adaptiveCard}><Text style={styles.adaptiveEyebrow}>NOMI ADAPTED</Text><Text style={styles.adaptiveBody}>{adaptivePractice.message}</Text></View>
-      <Pressable style={[styles.button, styles.completionButton]} onPress={restartSession}><Text style={styles.buttonText}>Practice again</Text></Pressable>
+      <Text style={styles.completionEyebrow}>{topicMastered?"TOPIC MASTERED":"PRACTICE COMPLETE"}</Text><Text style={styles.completionTitle}>{topicMastered?`You mastered ${topicName}.`:`Nice work. You finished ${topicName}.`}</Text>
+      <Text style={styles.completionScore}>{score} / {questions.length} correct{completedMastery!==null?` · ${completedMastery}/100 mastery`:""}</Text>
+      <View style={styles.adaptiveCard}><Text style={styles.adaptiveEyebrow}>NOMI ADAPTED</Text><Text style={styles.adaptiveBody}>{topicMastered?"Your evidence crossed the mastery threshold. Return to Learn to see what unlocks next.":adaptivePractice.message}</Text></View>
+      <Pressable style={[styles.button, styles.completionButton]} onPress={()=>router.replace("/(tabs)/learn")}><Text style={styles.buttonText}>{topicMastered?"See what’s next":"Back to Learn"}</Text></Pressable>
+      <Pressable style={styles.secondaryCompletionButton} onPress={restartSession}><Text style={styles.secondaryCompletionButtonText}>Practice again</Text></Pressable>
     </View></SafeAreaView>
   );
 
@@ -88,5 +93,5 @@ export default function PracticeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea:{flex:1,backgroundColor:colors.cream},screen:{flexGrow:1,padding:spacing.lg,paddingBottom:spacing.xl},header:{alignItems:"center",flexDirection:"row",justifyContent:"space-between"},headerCopy:{flex:1,paddingRight:spacing.sm},eyebrow:{color:colors.primaryPurple,fontSize:11,fontWeight:"900",letterSpacing:1.1},progressText:{color:colors.slate,fontSize:13,marginTop:5},mascot:{height:72,width:72},progressTrack:{backgroundColor:colors.stone,borderRadius:radius.pill,height:7,marginTop:spacing.md,overflow:"hidden"},progressFill:{backgroundColor:colors.mint,borderRadius:radius.pill,height:7},questionBlock:{marginTop:spacing.xl},prompt:{color:colors.primaryPurple,fontSize:12,fontWeight:"900",letterSpacing:.8,textTransform:"uppercase"},expression:{color:colors.ink,fontSize:30,fontWeight:"800",letterSpacing:-.7,lineHeight:38,marginTop:spacing.sm},helper:{color:colors.slate,fontSize:14,lineHeight:21,marginTop:spacing.sm},answers:{gap:10,marginTop:spacing.xl},answer:{backgroundColor:colors.white,borderColor:colors.stone,borderRadius:radius.md,borderWidth:2,paddingHorizontal:spacing.lg,paddingVertical:17},answerActive:{borderColor:colors.primaryPurple,backgroundColor:colors.lavender},answerCorrect:{borderColor:colors.mint,borderWidth:2},answerWrong:{borderColor:colors.pink,borderWidth:2},answerText:{color:colors.ink,fontSize:18,fontWeight:"700"},answerTextActive:{color:colors.primaryPurple},input:{backgroundColor:colors.white,borderColor:colors.stone,borderRadius:radius.md,borderWidth:2,color:colors.ink,fontSize:18,fontWeight:"700",marginTop:spacing.xl,paddingHorizontal:spacing.lg,paddingVertical:16},feedback:{borderRadius:radius.md,marginTop:spacing.md,padding:spacing.md},feedbackCorrect:{backgroundColor:colors.lavender},feedbackRetry:{backgroundColor:colors.pink},feedbackEyebrow:{color:colors.primaryPurple,fontSize:10,fontWeight:"900",letterSpacing:1.1},feedbackTitle:{color:colors.ink,fontSize:16,fontWeight:"800",lineHeight:21,marginTop:5},feedbackBody:{color:colors.slate,fontSize:13,lineHeight:19,marginTop:4},button:{alignItems:"center",backgroundColor:colors.primaryPurple,borderRadius:radius.pill,marginTop:"auto",paddingVertical:16},completionButton:{alignSelf:"stretch",marginTop:spacing.xl},retryButton:{alignSelf:"stretch",marginTop:spacing.xl},buttonDisabled:{opacity:.35},buttonText:{color:colors.white,fontSize:16,fontWeight:"800"},completionScreen:{flex:1,alignItems:"center",justifyContent:"center",padding:spacing.xl},centerState:{flex:1,alignItems:"center",justifyContent:"center",padding:spacing.xl},completionMascot:{height:140,width:140,marginBottom:spacing.lg},completionEyebrow:{color:colors.primaryPurple,fontSize:11,fontWeight:"900",letterSpacing:1.2},completionTitle:{color:colors.ink,fontSize:30,fontWeight:"800",lineHeight:35,marginTop:spacing.sm,textAlign:"center"},completionScore:{color:colors.primaryPurple,fontSize:22,fontWeight:"900",marginTop:spacing.lg},stateBody:{color:colors.slate,fontSize:14,lineHeight:21,marginTop:spacing.md,textAlign:"center"},adaptiveCard:{alignSelf:"stretch",backgroundColor:colors.lavender,borderRadius:radius.md,marginTop:spacing.lg,padding:spacing.lg},adaptiveEyebrow:{color:colors.primaryPurple,fontSize:10,fontWeight:"900",letterSpacing:1.1},adaptiveBody:{color:colors.ink,fontSize:14,fontWeight:"700",lineHeight:21,marginTop:6}
+  safeArea:{flex:1,backgroundColor:colors.cream},screen:{flexGrow:1,padding:spacing.lg,paddingBottom:spacing.xl},header:{alignItems:"center",flexDirection:"row",justifyContent:"space-between"},headerCopy:{flex:1,paddingRight:spacing.sm},eyebrow:{color:colors.primaryPurple,fontSize:11,fontWeight:"900",letterSpacing:1.1},progressText:{color:colors.slate,fontSize:13,marginTop:5},mascot:{height:72,width:72},progressTrack:{backgroundColor:colors.stone,borderRadius:radius.pill,height:7,marginTop:spacing.md,overflow:"hidden"},progressFill:{backgroundColor:colors.mint,borderRadius:radius.pill,height:7},questionBlock:{marginTop:spacing.xl},prompt:{color:colors.primaryPurple,fontSize:12,fontWeight:"900",letterSpacing:.8,textTransform:"uppercase"},expression:{color:colors.ink,fontSize:30,fontWeight:"800",letterSpacing:-.7,lineHeight:38,marginTop:spacing.sm},helper:{color:colors.slate,fontSize:14,lineHeight:21,marginTop:spacing.sm},answers:{gap:10,marginTop:spacing.xl},answer:{backgroundColor:colors.white,borderColor:colors.stone,borderRadius:radius.md,borderWidth:2,paddingHorizontal:spacing.lg,paddingVertical:17},answerActive:{borderColor:colors.primaryPurple,backgroundColor:colors.lavender},answerCorrect:{borderColor:colors.mint,borderWidth:2},answerWrong:{borderColor:colors.pink,borderWidth:2},answerText:{color:colors.ink,fontSize:18,fontWeight:"700"},answerTextActive:{color:colors.primaryPurple},input:{backgroundColor:colors.white,borderColor:colors.stone,borderRadius:radius.md,borderWidth:2,color:colors.ink,fontSize:18,fontWeight:"700",marginTop:spacing.xl,paddingHorizontal:spacing.lg,paddingVertical:16},feedback:{borderRadius:radius.md,marginTop:spacing.md,padding:spacing.md},feedbackCorrect:{backgroundColor:colors.lavender},feedbackRetry:{backgroundColor:colors.pink},feedbackEyebrow:{color:colors.primaryPurple,fontSize:10,fontWeight:"900",letterSpacing:1.1},feedbackTitle:{color:colors.ink,fontSize:16,fontWeight:"800",lineHeight:21,marginTop:5},feedbackBody:{color:colors.slate,fontSize:13,lineHeight:19,marginTop:4},button:{alignItems:"center",backgroundColor:colors.primaryPurple,borderRadius:radius.pill,marginTop:"auto",paddingVertical:16},completionButton:{alignSelf:"stretch",marginTop:spacing.xl},retryButton:{alignSelf:"stretch",marginTop:spacing.xl},buttonDisabled:{opacity:.35},buttonText:{color:colors.white,fontSize:16,fontWeight:"800"},secondaryCompletionButton:{alignItems:"center",alignSelf:"stretch",borderColor:colors.primaryPurple,borderRadius:radius.pill,borderWidth:1,marginTop:10,paddingVertical:15},secondaryCompletionButtonText:{color:colors.primaryPurple,fontSize:15,fontWeight:"800"},completionScreen:{flex:1,alignItems:"center",justifyContent:"center",padding:spacing.xl},centerState:{flex:1,alignItems:"center",justifyContent:"center",padding:spacing.xl},completionMascot:{height:140,width:140,marginBottom:spacing.lg},completionEyebrow:{color:colors.primaryPurple,fontSize:11,fontWeight:"900",letterSpacing:1.2},completionTitle:{color:colors.ink,fontSize:30,fontWeight:"800",lineHeight:35,marginTop:spacing.sm,textAlign:"center"},completionScore:{color:colors.primaryPurple,fontSize:20,fontWeight:"900",marginTop:spacing.lg,textAlign:"center"},stateBody:{color:colors.slate,fontSize:14,lineHeight:21,marginTop:spacing.md,textAlign:"center"},adaptiveCard:{alignSelf:"stretch",backgroundColor:colors.lavender,borderRadius:radius.md,marginTop:spacing.lg,padding:spacing.lg},adaptiveEyebrow:{color:colors.primaryPurple,fontSize:10,fontWeight:"900",letterSpacing:1.1},adaptiveBody:{color:colors.ink,fontSize:14,fontWeight:"700",lineHeight:21,marginTop:6}
 });
