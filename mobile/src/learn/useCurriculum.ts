@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useFocusEffect } from "expo-router";
 
 import { useLearnerSession } from "@/auth/LearnerSessionContext";
 import { supabase } from "@/lib/supabase";
@@ -42,7 +43,7 @@ export function useCurriculum(subjectSlug = "mathematics") {
     setSubject(subjectData as CurriculumSubject); setRows((topicData ?? []) as TopicRow[]); setProgressRows((learnerProgress ?? []) as ProgressRow[]); setLoading(false);
   }, [subjectSlug, user]);
 
-  useEffect(() => { void load(); }, [load]);
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
 
   const topics = useMemo<CurriculumTopic[]>(() => {
     const progress = new Map(progressRows.map((item) => [item.topic_id, item]));
