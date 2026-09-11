@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -7,12 +8,17 @@ import { colors, radius, spacing } from "@/theme/tokens";
 
 export default function LearnScreen(){
   const router=useRouter();
-  const{mastery,masterySource,adaptivePractice,misconception,syncing,syncError}=usePracticeProgress();
+  const{mastery,masterySource,adaptivePractice,misconception,activeTopicId,setActiveTopic,syncing,syncError}=usePracticeProgress();
   const{subject,topics,currentTopic,parentName,loading,error}=useCurriculum("mathematics");
-  const activeMastery=currentTopic?.slug==="factorisation"?mastery:currentTopic?.mastery??0;
-  const activeDifficulty=currentTopic?.slug==="factorisation"?adaptivePractice.difficulty:currentTopic?.difficulty??1;
+
+  useEffect(()=>{if(currentTopic)setActiveTopic(currentTopic.id,currentTopic.name);},[currentTopic,setActiveTopic]);
+
+  const activeStateReady=Boolean(currentTopic&&activeTopicId===currentTopic.id);
+  const activeMastery=activeStateReady?mastery:currentTopic?.mastery??0;
+  const activeDifficulty=activeStateReady?adaptivePractice.difficulty:currentTopic?.difficulty??1;
   const masteryLabel=activeMastery>=80?"Strong":activeMastery>=60?"Developing":activeMastery>0?"Building":"Not started";
-  const nextAction=misconception?.status==="recurring"&&currentTopic?.slug==="factorisation"?"Review the current misconception":activeMastery>=80?"Move to the next concept":`Continue ${currentTopic?.name??"learning"}`;
+  const nextAction=misconception?.status==="recurring"&&activeStateReady?"Review the current misconception":activeMastery>=80?"Move to the next concept":`Continue ${currentTopic?.name??"learning"}`;
+  const adaptiveMessage=activeStateReady?adaptivePractice.message:"Nomi is loading this topic’s assessed learner state.";
   const pathTopics=topics.filter((topic)=>topic.id!==currentTopic?.id);
 
   function openPractice(){
@@ -29,7 +35,7 @@ export default function LearnScreen(){
         <View style={styles.rowBetween}><View style={styles.currentTag}><Text style={styles.currentTagText}>{currentTopic.state.toUpperCase()}</Text></View><Text style={styles.mastery}>{activeMastery}/100</Text></View>
         <Text style={styles.topicTitle}>{currentTopic.name}</Text><Text style={styles.topicDescription}>{currentTopic.description??"Build confidence through structured, assessed practice."}</Text>
         <View style={styles.progressTrack}><View style={[styles.progressFill,{width:`${Math.max(2,activeMastery)}%`}]} /></View><View style={styles.rowBetween}><Text style={styles.progressLabel}>{masteryLabel} mastery</Text><Text style={styles.progressMeta}>{activeDifficulty}/10 difficulty</Text></View>
-        <View style={styles.adaptiveBox}><Text style={styles.adaptiveEyebrow}>NOMI'S NEXT MOVE</Text><Text style={styles.adaptiveTitle}>{nextAction}</Text><Text style={styles.adaptiveText}>{currentTopic.slug==="factorisation"?adaptivePractice.message:"Continue through the curriculum to establish assessed evidence for this topic."}</Text>{misconception&&currentTopic.slug==="factorisation"?<Text style={styles.misconception}>{misconception.message}</Text>:null}</View>
+        <View style={styles.adaptiveBox}><Text style={styles.adaptiveEyebrow}>NOMI'S NEXT MOVE</Text><Text style={styles.adaptiveTitle}>{nextAction}</Text><Text style={styles.adaptiveText}>{adaptiveMessage}</Text>{misconception&&activeStateReady?<Text style={styles.misconception}>{misconception.message}</Text>:null}</View>
         <View style={styles.actions}><Pressable onPress={openPractice} style={styles.primaryButton}><Text style={styles.primaryButtonText}>{activeMastery>0?"Continue practice":"Start topic"}</Text></Pressable><Pressable onPress={()=>router.push("/(tabs)/nomi")} style={styles.secondaryButton}><Text style={styles.secondaryButtonText}>Ask Nomi</Text></Pressable></View>
         <Text style={styles.evidenceNote}>{syncing?"Syncing learner evidence…":masterySource==="supabase"?"Progress is backed by assessed practice evidence.":masterySource==="new-learner"?"Complete assessed Practice to establish your mastery.":"Prototype learner state is active."}</Text>{syncError?<Text style={styles.errorText}>{syncError}</Text>:null}
       </View>
