@@ -12,8 +12,13 @@ export default function LearnScreen(){
   const activeMastery=currentTopic?.slug==="factorisation"?mastery:currentTopic?.mastery??0;
   const activeDifficulty=currentTopic?.slug==="factorisation"?adaptivePractice.difficulty:currentTopic?.difficulty??1;
   const masteryLabel=activeMastery>=80?"Strong":activeMastery>=60?"Developing":activeMastery>0?"Building":"Not started";
-  const nextAction=misconception?.status==="recurring"&&currentTopic?.slug==="factorisation"?"Review the common-factor step":activeMastery>=80?"Move to the next concept":`Continue ${currentTopic?.name??"learning"}`;
+  const nextAction=misconception?.status==="recurring"&&currentTopic?.slug==="factorisation"?"Review the current misconception":activeMastery>=80?"Move to the next concept":`Continue ${currentTopic?.name??"learning"}`;
   const pathTopics=topics.filter((topic)=>topic.id!==currentTopic?.id);
+
+  function openPractice(){
+    if(!currentTopic||!subject)return;
+    router.push({pathname:"/(tabs)/practice",params:{topicId:currentTopic.id,topicSlug:currentTopic.slug,topicName:currentTopic.name,subjectId:subject.id,subjectName:subject.name}});
+  }
 
   return <SafeAreaView style={styles.safeArea}><ScrollView contentContainerStyle={styles.screen} showsVerticalScrollIndicator={false}>
     <Text style={styles.eyebrow}>LEARN</Text><Text style={styles.title}>Build it one idea at a time.</Text><Text style={styles.description}>Your curriculum stays structured while Nomi adapts the depth, difficulty and next step around your evidence.</Text>
@@ -25,7 +30,7 @@ export default function LearnScreen(){
         <Text style={styles.topicTitle}>{currentTopic.name}</Text><Text style={styles.topicDescription}>{currentTopic.description??"Build confidence through structured, assessed practice."}</Text>
         <View style={styles.progressTrack}><View style={[styles.progressFill,{width:`${Math.max(2,activeMastery)}%`}]} /></View><View style={styles.rowBetween}><Text style={styles.progressLabel}>{masteryLabel} mastery</Text><Text style={styles.progressMeta}>{activeDifficulty}/10 difficulty</Text></View>
         <View style={styles.adaptiveBox}><Text style={styles.adaptiveEyebrow}>NOMI'S NEXT MOVE</Text><Text style={styles.adaptiveTitle}>{nextAction}</Text><Text style={styles.adaptiveText}>{currentTopic.slug==="factorisation"?adaptivePractice.message:"Continue through the curriculum to establish assessed evidence for this topic."}</Text>{misconception&&currentTopic.slug==="factorisation"?<Text style={styles.misconception}>{misconception.message}</Text>:null}</View>
-        <View style={styles.actions}><Pressable onPress={()=>router.push("/(tabs)/practice")} style={styles.primaryButton}><Text style={styles.primaryButtonText}>{activeMastery>0?"Continue practice":"Start topic"}</Text></Pressable><Pressable onPress={()=>router.push("/(tabs)/nomi")} style={styles.secondaryButton}><Text style={styles.secondaryButtonText}>Ask Nomi</Text></Pressable></View>
+        <View style={styles.actions}><Pressable onPress={openPractice} style={styles.primaryButton}><Text style={styles.primaryButtonText}>{activeMastery>0?"Continue practice":"Start topic"}</Text></Pressable><Pressable onPress={()=>router.push("/(tabs)/nomi")} style={styles.secondaryButton}><Text style={styles.secondaryButtonText}>Ask Nomi</Text></Pressable></View>
         <Text style={styles.evidenceNote}>{syncing?"Syncing learner evidence…":masterySource==="supabase"?"Progress is backed by assessed practice evidence.":masterySource==="new-learner"?"Complete assessed Practice to establish your mastery.":"Prototype learner state is active."}</Text>{syncError?<Text style={styles.errorText}>{syncError}</Text>:null}
       </View>
 
