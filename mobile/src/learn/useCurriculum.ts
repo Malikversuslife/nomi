@@ -65,8 +65,10 @@ export function useCurriculum(subjectSlug = "mathematics") {
     });
   }, [progressRows, rows]);
 
-  const currentTopic = topics.find((topic) => topic.state === "current") ?? topics.find((topic) => topic.state === "next") ?? topics.at(-1) ?? null;
-  const parentName = currentTopic ? rows.find((row) => row.id === currentTopic.parentTopicId)?.name ?? null : null;
+  const isPathComplete = topics.length > 0 && topics.every((topic) => topic.state === "completed");
+  const currentTopic = isPathComplete ? null : topics.find((topic) => topic.state === "current") ?? topics.find((topic) => topic.state === "next") ?? null;
+  const referenceTopic = currentTopic ?? topics.at(-1) ?? null;
+  const parentName = referenceTopic ? rows.find((row) => row.id === referenceTopic.parentTopicId)?.name ?? null : null;
 
-  return { subject, topics, currentTopic, parentName, loading, error, refresh: load };
+  return { subject, topics, currentTopic, parentName, isPathComplete, loading, error, refresh: load };
 }
