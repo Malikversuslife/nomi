@@ -8,7 +8,9 @@ type LearnerSessionContextValue = {
   loading: boolean;
   user: User | null;
   displayName: string | null;
+  onboardingCompleted: boolean | null;
   error: string | null;
+  refreshProfile: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string, displayName: string) => Promise<{ ok: boolean; needsEmailConfirmation: boolean }>;
   resetPassword: (email: string) => Promise<boolean>;
@@ -21,7 +23,31 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
   const [loading, setLoading] = useState(supabaseConfigured);
   const [user, setUser] = useState<User | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  async function hydrate(nextUser: User | null) {
+    setLoading(true);
+    setUser(nextUser);
+    setDisplayName(null);
+    setOnboardingCompleted(nextUser ? null : false);
+
+    if (!nextUser || !supabase) {
+      setLoading(false);
+      return;
+    }
+
+    const { data, error: profileError } = await supabase
+      .from("profiles")
+      .select("display_name,onboarding_completed_at")
+      .eq("id", nextUser.id)
+      .maybeSingle();
+
+    if (profileError) setError(profileError.message);
+    setDisplayName(data?.display_name ?? null);
+    setOnboardingCompleted(Boolean(data?.onboarding_completed_at));
+    setLoading(false);
+  }
 
   useEffect(() => {
     if (!supabase) {
@@ -31,23 +57,12 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
 
     let mounted = true;
 
-    async function hydrate(nextUser: User | null) {
-      if (!mounted) return;
-      setUser(nextUser);
-      setDisplayName(null);
-      if (!nextUser) return;
-
-      const { data } = await supabase.from("profiles").select("display_name").eq("id", nextUser.id).maybeSingle();
-      if (mounted) setDisplayName(data?.display_name ?? null);
-    }
-
-    supabase.auth.getSession().then(async ({ data }) => {
-      await hydrate(data.session?.user ?? null);
-      if (mounted) setLoading(false);
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) void hydrate(data.session?.user ?? null);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      void hydrate(session?.user ?? null);
+      if (mounted) void hydrate(session?.user ?? null);
     });
 
     return () => {
@@ -61,7 +76,11 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
     loading,
     user,
     displayName,
+    onboardingCompleted,
     error,
+    refreshProfile: async () => {
+      if (user) await hydrate(user);
+    },
     signIn: async (email, password) => {
       if (!supabase) {
         setError("Supabase is not configured for the mobile app yet.");
@@ -69,12 +88,13 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
       }
       setError(null);
       setLoading(true);
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      setLoading(false);
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
+        setLoading(false);
         setError(signInError.message);
         return false;
       }
+      await hydrate(data.user);
       return true;
     },
     signUp: async (email, password, name) => {
@@ -89,11 +109,13 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
         password,
         options: { data: { display_name: name.trim() } },
       });
-      setLoading(false);
       if (signUpError) {
+        setLoading(false);
         setError(signUpError.message);
         return { ok: false, needsEmailConfirmation: false };
       }
+      if (data.user && data.session) await hydrate(data.user);
+      else setLoading(false);
       return { ok: true, needsEmailConfirmation: !data.session };
     },
     resetPassword: async (email) => {
@@ -113,8 +135,11 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
       if (!supabase) return;
       setError(null);
       await supabase.auth.signOut();
+      setUser(null);
+      setDisplayName(null);
+      setOnboardingCompleted(false);
     },
-  }), [displayName, error, loading, user]);
+  }), [displayName, error, loading, onboardingCompleted, user]);
 
   return <LearnerSessionContext.Provider value={value}>{children}</LearnerSessionContext.Provider>;
 }
