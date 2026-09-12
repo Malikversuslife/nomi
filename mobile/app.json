@@ -6,14 +6,30 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#FFF9F2",
-    "plugins": ["expo-router"],
+    "backgroundColor": "#FBF8F3",
+    "icon": "../public/brand/nomi/logo.png",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FBF8F3",
+          "image": "../public/brand/nomi/lockup-primary.png",
+          "imageWidth": 180,
+          "resizeMode": "contain"
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.nomi.mobile"
     },
     "android": {
-      "package": "app.nomi.mobile"
+      "package": "app.nomi.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "../public/brand/nomi/logo.png",
+        "backgroundColor": "#FBF8F3"
+      }
     },
     "experiments": {
       "typedRoutes": true
