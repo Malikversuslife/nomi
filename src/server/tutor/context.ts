@@ -9,30 +9,49 @@ export type TutorServerContext = {
   title: string;
 };
 
-export async function buildTutorContext(userId: string): Promise<TutorServerContext> {
+export async function buildTutorContext(userId: string, topicId?: string | null): Promise<TutorServerContext> {
   // Mobile tutor requests authenticate with a Bearer token rather than the web
   // app's cookie session. Use the service-role client only after the route has
   // verified that token, then scope every learner query explicitly to userId.
   const supabase = createSupabaseAdminClient();
 
-  const { data: progress, error: progressError } = await supabase
-    .from("topic_progress")
-    .select("*")
-    .eq("user_id", userId)
-    .order("updated_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  let progressQuery = supabase.from("topic_progress").select("*").eq("user_id", userId);
+  progressQuery = topicId ? progressQuery.eq("topic_id", topicId) : progressQuery.order("updated_at", { ascending: false });
+  const { data: progress, error: progressError } = await progressQuery.limit(1).maybeSingle();
 
   if (progressError) {
     throw new Error(`Unable to load tutor progress: ${progressError.message}`);
   }
 
   if (!progress) {
+    let selectedTopic: { id: string; name: string; subject_id: string } | null = null;
+    let subjectName: string | null = null;
+
+    if (topicId) {
+      const { data: topic, error: topicError } = await supabase
+        .from("topics")
+        .select("id,name,subject_id")
+        .eq("id", topicId)
+        .maybeSingle();
+      if (topicError) throw new Error(`Unable to load tutor topic: ${topicError.message}`);
+      selectedTopic = topic;
+
+      if (selectedTopic) {
+        const { data: subject, error: subjectError } = await supabase
+          .from("subjects")
+          .select("name")
+          .eq("id", selectedTopic.subject_id)
+          .maybeSingle();
+        if (subjectError) throw new Error(`Unable to load tutor subject: ${subjectError.message}`);
+        subjectName = subject?.name ?? null;
+      }
+    }
+
     return {
-      client: { subjectName: null, topicName: null },
-      input: {},
+      client: { subjectName, topicName: selectedTopic?.name ?? null },
+      input: { subjectName, topicName: selectedTopic?.name ?? null },
       topicProgressId: null,
-      title: "General tutor",
+      title: selectedTopic?.name ?? "General tutor",
     };
   }
 
