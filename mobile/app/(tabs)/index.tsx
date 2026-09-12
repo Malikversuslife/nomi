@@ -1,14 +1,53 @@
-import { Link } from "expo-router";
-import { Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+import { useCurriculum } from "@/learn/useCurriculum";
 import { colors, radius, spacing } from "@/theme/tokens";
 
 const mascotUri =
   "https://raw.githubusercontent.com/Malikversuslife/nomi/main/public/brand/nomi/mascot/encouraging.png";
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { subject, topics, currentTopic, parentName, isPathComplete, loading, error } = useCurriculum("mathematics");
+  const completedCount = topics.filter((topic) => topic.state === "completed").length;
+  const totalCount = topics.length;
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+  const title = isPathComplete ? "You finished this path." : "Ready to keep going?";
+  const subtitle = isPathComplete
+    ? "Quadratic equations are mastered. Nomi can help you decide what comes next."
+    : "A little progress today still counts.";
+  const lessonTitle = isPathComplete ? "Quadratic equations" : currentTopic?.name ?? "Your next topic";
+  const lessonMeta = isPathComplete
+    ? `${completedCount}/${totalCount} topics mastered`
+    : `${parentName ?? "Mathematics"} · ${currentTopic?.difficulty ?? 1}/10 difficulty`;
+  const mastery = isPathComplete ? 100 : currentTopic?.mastery ?? 0;
+
+  function handlePrimaryAction() {
+    if (isPathComplete) {
+      router.push("/(tabs)/learn");
+      return;
+    }
+    if (currentTopic && subject) {
+      router.push({
+        pathname: "/(tabs)/practice",
+        params: {
+          topicId: currentTopic.id,
+          topicSlug: currentTopic.slug,
+          topicName: currentTopic.name,
+          subjectId: subject.id,
+          subjectName: subject.name,
+        },
+      });
+      return;
+    }
+    router.push("/(tabs)/learn");
+  }
+
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
           <Text style={styles.wordmark}>nomi</Text>
@@ -17,59 +56,59 @@ export default function HomeScreen() {
 
         <View style={styles.hero}>
           <View style={styles.heroCopy}>
-            <Text style={styles.kicker}>GOOD MORNING</Text>
-            <Text style={styles.title}>Ready to keep going?</Text>
-            <Text style={styles.subtitle}>A little progress today still counts.</Text>
+            <Text style={styles.kicker}>{isPathComplete ? "PATH COMPLETE" : "KEEP LEARNING"}</Text>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
           <Image source={{ uri: mascotUri }} style={styles.mascot} resizeMode="contain" />
         </View>
 
-        <Text style={styles.sectionLabel}>CONTINUE LEARNING</Text>
+        <Text style={styles.sectionLabel}>{isPathComplete ? "LEARNING STATUS" : "CONTINUE LEARNING"}</Text>
         <View style={styles.lessonCard}>
-          <View style={styles.subjectPill}><Text style={styles.subjectPillText}>Mathematics</Text></View>
-          <Text style={styles.lessonTitle}>Factorisation</Text>
-          <Text style={styles.lessonMeta}>Common factors · about 8 min</Text>
+          <View style={styles.subjectPill}><Text style={styles.subjectPillText}>{subject?.name ?? "Mathematics"}</Text></View>
+          <Text style={styles.lessonTitle}>{loading ? "Loading your learner state…" : lessonTitle}</Text>
+          <Text style={styles.lessonMeta}>{error ? error : lessonMeta}</Text>
 
           <View style={styles.progressTrack}>
-            <View style={styles.progressFill} />
+            <View style={[styles.progressFill, { width: `${Math.max(2, mastery)}%` }]} />
           </View>
           <View style={styles.progressRow}>
-            <Text style={styles.progressCopy}>You are making progress</Text>
-            <Text style={styles.progressValue}>64%</Text>
+            <Text style={styles.progressCopy}>{isPathComplete ? "Path mastery" : "Assessed mastery"}</Text>
+            <Text style={styles.progressValue}>{mastery}%</Text>
           </View>
 
-          <Link href="/practice" asChild>
-            <Pressable
-              style={styles.primaryButton}
-              accessibilityRole="button"
-              accessibilityLabel="Continue Factorisation"
-            >
-              <Text style={styles.primaryButtonText}>Continue learning</Text>
-            </Pressable>
-          </Link>
+          <Pressable
+            style={styles.primaryButton}
+            accessibilityRole="button"
+            accessibilityLabel={isPathComplete ? "Review completed learning path" : `Continue ${lessonTitle}`}
+            onPress={handlePrimaryAction}
+          >
+            <Text style={styles.primaryButtonText}>{isPathComplete ? "Review completed path" : "Continue learning"}</Text>
+          </Pressable>
         </View>
 
         <View style={styles.insightCard}>
           <View style={styles.insightDot} />
           <View style={styles.insightCopy}>
             <Text style={styles.insightEyebrow}>NOMI NOTICED</Text>
-            <Text style={styles.insightTitle}>You are getting quicker at spotting common factors.</Text>
-            <Text style={styles.insightBody}>Keep going. The next practice set will build on that.</Text>
+            <Text style={styles.insightTitle}>{isPathComplete ? "Your assessed evidence is strong across this unit." : `${lessonTitle} is your active learning step.`}</Text>
+            <Text style={styles.insightBody}>{isPathComplete ? "You can review weak evidence, mix practice across concepts, or move forward when the next unit is ready." : `Your current mastery is ${mastery}/100. Nomi will keep adapting difficulty around your assessed practice.`}</Text>
           </View>
         </View>
 
         <View style={styles.weekHeader}>
-          <Text style={styles.sectionLabel}>YOUR WEEK</Text>
-          <Text style={styles.weekCount}>4 days</Text>
+          <Text style={styles.sectionLabel}>PATH PROGRESS</Text>
+          <Text style={styles.weekCount}>{completedCount}/{totalCount || 0} topics</Text>
         </View>
         <View style={styles.weekRow}>
-          {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
-            <View key={`${day}-${index}`} style={styles.dayItem}>
-              <View style={[styles.dayDot, index < 4 && styles.dayDotActive]} />
-              <Text style={styles.dayText}>{day}</Text>
+          {topics.slice(0, 7).map((topic) => (
+            <View key={topic.id} style={styles.dayItem}>
+              <View style={[styles.dayDot, topic.state === "completed" && styles.dayDotActive]} />
+              <Text numberOfLines={1} style={styles.dayText}>{topic.name.charAt(0)}</Text>
             </View>
           ))}
         </View>
+        {totalCount > 0 ? <Text style={styles.pathSummary}>{progressPercent}% of this path completed</Text> : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -95,7 +134,7 @@ const styles = StyleSheet.create({
   lessonTitle: { color: colors.ink, fontSize: 28, fontWeight: "800", letterSpacing: -0.8, marginTop: spacing.md },
   lessonMeta: { color: colors.slate, fontSize: 14, marginTop: 5 },
   progressTrack: { backgroundColor: colors.stone, borderRadius: radius.pill, height: 8, marginTop: spacing.lg, overflow: "hidden" },
-  progressFill: { backgroundColor: colors.primaryPurple, borderRadius: radius.pill, height: 8, width: "64%" },
+  progressFill: { backgroundColor: colors.primaryPurple, borderRadius: radius.pill, height: 8 },
   progressRow: { flexDirection: "row", justifyContent: "space-between", marginTop: spacing.sm },
   progressCopy: { color: colors.slate, fontSize: 13 },
   progressValue: { color: colors.ink, fontSize: 13, fontWeight: "800" },
@@ -110,8 +149,9 @@ const styles = StyleSheet.create({
   weekHeader: { alignItems: "flex-end", flexDirection: "row", justifyContent: "space-between" },
   weekCount: { color: colors.primaryPurple, fontSize: 13, fontWeight: "800" },
   weekRow: { flexDirection: "row", justifyContent: "space-between", marginTop: spacing.md },
-  dayItem: { alignItems: "center", gap: 7 },
+  dayItem: { alignItems: "center", gap: 7, maxWidth: 42 },
   dayDot: { backgroundColor: colors.stone, borderRadius: radius.pill, height: 30, width: 30 },
   dayDotActive: { backgroundColor: colors.mint },
   dayText: { color: colors.slate, fontSize: 11, fontWeight: "700" },
+  pathSummary: { color: colors.slate, fontSize: 12, marginTop: spacing.sm },
 });
