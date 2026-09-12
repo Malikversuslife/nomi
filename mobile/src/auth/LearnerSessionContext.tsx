@@ -10,6 +10,8 @@ type LearnerSessionContextValue = {
   displayName: string | null;
   error: string | null;
   signIn: (email: string, password: string) => Promise<boolean>;
+  signUp: (email: string, password: string, displayName: string) => Promise<{ ok: boolean; needsEmailConfirmation: boolean }>;
+  resetPassword: (email: string) => Promise<boolean>;
   signOut: () => Promise<void>;
 };
 
@@ -71,6 +73,38 @@ export function LearnerSessionProvider({ children }: PropsWithChildren) {
       setLoading(false);
       if (signInError) {
         setError(signInError.message);
+        return false;
+      }
+      return true;
+    },
+    signUp: async (email, password, name) => {
+      if (!supabase) {
+        setError("Supabase is not configured for the mobile app yet.");
+        return { ok: false, needsEmailConfirmation: false };
+      }
+      setError(null);
+      setLoading(true);
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { display_name: name.trim() } },
+      });
+      setLoading(false);
+      if (signUpError) {
+        setError(signUpError.message);
+        return { ok: false, needsEmailConfirmation: false };
+      }
+      return { ok: true, needsEmailConfirmation: !data.session };
+    },
+    resetPassword: async (email) => {
+      if (!supabase) {
+        setError("Supabase is not configured for the mobile app yet.");
+        return false;
+      }
+      setError(null);
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email);
+      if (resetError) {
+        setError(resetError.message);
         return false;
       }
       return true;
