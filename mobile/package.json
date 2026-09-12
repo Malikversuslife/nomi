@@ -13,6 +13,8 @@
   "dependencies": {
     "@expo-google-fonts/bricolage-grotesque": "latest",
     "@expo-google-fonts/inter": "latest",
+    "@hugeicons/core-free-icons": "latest",
+    "@hugeicons/react-native": "latest",
     "@react-native-async-storage/async-storage": "latest",
     "@supabase/supabase-js": "2.112.4",
     "expo": "latest",
@@ -20,11 +22,13 @@
     "expo-font": "latest",
     "expo-linking": "latest",
     "expo-router": "latest",
+    "expo-splash-screen": "latest",
     "expo-status-bar": "latest",
     "react": "latest",
     "react-native": "latest",
     "react-native-safe-area-context": "latest",
     "react-native-screens": "latest",
+    "react-native-svg": "latest",
     "react-native-url-polyfill": "latest"
   },
   "devDependencies": {
