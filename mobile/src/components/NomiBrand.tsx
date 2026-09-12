@@ -23,8 +23,8 @@ const mascotSources: Record<NomiMascotState, number> = {
   supportive: require("../../../public/brand/nomi/mascot/supportive.png"),
 };
 
-export function NomiWordmark({ width = 66, style }: { width?: number; style?: StyleProp<ImageStyle> }) {
-  return <Image source={wordmarkPurple} resizeMode="contain" style={[{ width, height: width * 0.36 }, style]} accessibilityLabel="Nomi" />;
+export function NomiWordmark({ width = 84, style }: { width?: number; style?: StyleProp<ImageStyle> }) {
+  return <Image source={wordmarkPurple} resizeMode="contain" style={[{ width, height: 38 }, style]} accessibilityLabel="Nomi" />;
 }
 
 export function NomiMascot({ state = "neutral", size = 88, style }: { state?: NomiMascotState; size?: number; style?: StyleProp<ImageStyle> }) {
