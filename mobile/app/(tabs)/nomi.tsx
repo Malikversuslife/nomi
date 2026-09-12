@@ -41,7 +41,7 @@ export default function NomiScreen(){
   const{mastery,misconception,adaptivePractice,latestSession,activeTopicName}=usePracticeProgress();
   const firstName=displayName?.split(" ")[0]??"there";
   const topicName=activeTopicName??latestSession?.topic??"Factorisation";
-  const starters=useMemo(()=>[`Explain ${topicName} another way","Show me a worked example","Quiz me on the step I keep missing"],[topicName]);
+  const starters=useMemo(()=>[`Explain ${topicName} another way`,"Show me a worked example","Quiz me on the step I keep missing"],[topicName]);
   const[input,setInput]=useState("");
   const[messages,setMessages]=useState<TutorMessage[]>([]);
   const[sending,setSending]=useState(false);
