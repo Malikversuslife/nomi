@@ -12,7 +12,7 @@ type SubjectOption = { id: string; name: string };
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { user, displayName } = useLearnerSession();
+  const { user, displayName, refreshProfile } = useLearnerSession();
   const [step, setStep] = useState(0);
   const [goal, setGoal] = useState("");
   const [level, setLevel] = useState("");
@@ -43,8 +43,13 @@ export default function OnboardingScreen() {
       p_grade_year: level.trim(),
       p_subject_ids: selectedSubjectIds,
     });
+    if (onboardingError) {
+      setSaving(false);
+      setError(onboardingError.message);
+      return;
+    }
+    await refreshProfile();
     setSaving(false);
-    if (onboardingError) { setError(onboardingError.message); return; }
     router.replace("/(tabs)");
   }
 
