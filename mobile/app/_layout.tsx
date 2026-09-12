@@ -21,27 +21,20 @@ function SessionGate() {
 
   useEffect(() => {
     if (loading) return;
-
     if (!user) {
       if (!isPublicAuthRoute) router.replace("/sign-in");
       return;
     }
-
     if (onboardingCompleted === false) {
       if (!isOnboarding) router.replace("/onboarding");
       return;
     }
-
-    if (onboardingCompleted === true && (isPublicAuthRoute || isOnboarding)) {
-      router.replace("/(tabs)");
-    }
+    if (onboardingCompleted === true && (isPublicAuthRoute || isOnboarding)) router.replace("/(tabs)");
   }, [isOnboarding, isPublicAuthRoute, loading, onboardingCompleted, router, user]);
 
-  if (loading || (user && onboardingCompleted === null)) {
-    return <View style={styles.splash}><View style={styles.mark}><View style={styles.face}><View style={styles.eye}/><View style={styles.eye}/></View></View><ActivityIndicator color={colors.primaryPurple}/></View>;
-  }
+  if (loading || (user && onboardingCompleted === null)) return <View style={styles.splash}><View style={styles.mark}><View style={styles.face}><View style={styles.eye}/><View style={styles.eye}/></View></View><ActivityIndicator color={colors.primaryPurple}/></View>;
 
-  return <><StatusBar style="dark"/><Stack screenOptions={{headerShown:false,contentStyle:{backgroundColor:colors.cream}}}><Stack.Screen name="sign-in"/><Stack.Screen name="sign-up"/><Stack.Screen name="forgot-password"/><Stack.Screen name="onboarding"/><Stack.Screen name="(tabs)"/></Stack></>;
+  return <><StatusBar style="dark"/><Stack screenOptions={{headerShown:false,contentStyle:{backgroundColor:colors.cream}}}><Stack.Screen name="sign-in"/><Stack.Screen name="sign-up"/><Stack.Screen name="forgot-password"/><Stack.Screen name="onboarding"/><Stack.Screen name="profile"/><Stack.Screen name="settings"/><Stack.Screen name="notifications"/><Stack.Screen name="(tabs)"/></Stack></>;
 }
 
 export default function RootLayout(){return <LearnerSessionProvider><PracticeProgressProvider><SessionGate/></PracticeProgressProvider></LearnerSessionProvider>;}
