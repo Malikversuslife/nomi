@@ -25,7 +25,7 @@ function SessionGate() {
 
   if (loading) return <View style={styles.splash}><View style={styles.mark}><View style={styles.face}><View style={styles.eye}/><View style={styles.eye}/></View></View><ActivityIndicator color={colors.primaryPurple}/></View>;
 
-  return <><StatusBar style="dark"/><Stack screenOptions={{headerShown:false,contentStyle:{backgroundColor:colors.cream}}}><Stack.Screen name="sign-in"/><Stack.Screen name="sign-up"/><Stack.Screen name="forgot-password"/><Stack.Screen name="(tabs)"/></Stack></>;
+  return <><StatusBar style="dark"/><Stack screenOptions={{headerShown:false,contentStyle:{backgroundColor:colors.cream}}}><Stack.Screen name="sign-in"/><Stack.Screen name="sign-up"/><Stack.Screen name="forgot-password"/><Stack.Screen name="onboarding"/><Stack.Screen name="(tabs)"/></Stack></>;
 }
 
 export default function RootLayout(){return <LearnerSessionProvider><PracticeProgressProvider><SessionGate/></PracticeProgressProvider></LearnerSessionProvider>;}
