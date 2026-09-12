@@ -8,6 +8,7 @@ import type { TutorConversationTurn } from "@/domain/tutor/types";
 
 const requestSchema = z.object({
   message: z.string().trim().min(1).max(1000),
+  topicId: z.string().uuid().nullable().optional(),
   transcript: z.array(z.object({
     role: z.enum(["user", "assistant"]),
     content: z.string().trim().min(1).max(3000),
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
     }
 
-    const context = await buildTutorContext(authData.user.id);
+    const context = await buildTutorContext(authData.user.id, parsed.data.topicId ?? null);
     const transcript: TutorConversationTurn[] = parsed.data.transcript;
     const response = await generateTutorResponse({
       context: context.input,
