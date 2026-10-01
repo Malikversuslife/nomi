@@ -17,11 +17,11 @@ vi.mock("@/server/auth/actions", () => ({
 }));
 
 describe("Nomi character integration", () => {
-  it("uses the approved encouraging companion on the welcome gateway", () => {
+  it("uses the approved curious companion in the marketing hero", () => {
     const { container } = render(<HomePage />);
 
     expect(container.querySelector("img[data-logo-variant=\"primaryLockup\"]")).toBeNull();
-    expect(container.querySelector("img[data-state]")).toHaveAttribute("data-state", "encouraging");
+    expect(container.querySelector("img[data-state]")).toHaveAttribute("data-state", "curious");
   });
 
   it("uses approved wordmarks and an appropriate desktop companion for auth", () => {
