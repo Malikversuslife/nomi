@@ -55,14 +55,14 @@ export function AppNavigation({ active, account }: { active: string; account: Ac
         <button type="button" aria-label="Open navigation" aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-full text-nomi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600">
           <AppIcon icon={Menu01Icon} size={23} />
         </button>
-        <NomiWordmark width={88} variant="purple" label="Nomi" />
+        <Link href="/" aria-label="Nomi website"><NomiWordmark width={88} variant="purple" label="Nomi" /></Link>
         <AccountMenu name={account?.name ?? null} email={account?.email ?? null} direction="down" align="end" compact />
       </header>
       <div className={`fixed inset-0 z-50 lg:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open}>
         <button type="button" aria-label="Close navigation" onClick={() => setOpen(false)} className={`absolute inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} />
         <aside id="mobile-navigation" aria-label="Main navigation" className={`nomi-material absolute inset-y-0 left-0 flex w-[min(20rem,86vw)] flex-col border-r border-nomi-border-subtle px-4 pb-[calc(1rem+var(--nomi-safe-bottom))] pt-[calc(1rem+var(--nomi-safe-top))] shadow-[var(--nomi-shadow-float)] transition-transform duration-300 ease-[cubic-bezier(.2,.8,.2,1)] ${open ? "translate-x-0" : "-translate-x-full"}`}>
           <div className="mb-6 flex items-center justify-between px-2">
-            <NomiWordmark width={104} variant="purple" label="Nomi" />
+            <Link href="/" aria-label="Nomi website" onClick={() => setOpen(false)}><NomiWordmark width={104} variant="purple" label="Nomi" /></Link>
             <button type="button" aria-label="Close navigation" onClick={() => setOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-full text-nomi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600">
               <AppIcon icon={Cancel01Icon} size={22} />
             </button>
@@ -77,7 +77,7 @@ export function AppNavigation({ active, account }: { active: string; account: Ac
 function SidebarContents({ active, account, mobile = false, onNavigate }: { active: string; account: Account; mobile?: boolean; onNavigate?: () => void }) {
   return (
     <>
-      {!mobile ? <div className="mb-8 px-2"><NomiWordmark width={112} variant="purple" label="Nomi" /></div> : null}
+      {!mobile ? <div className="mb-8 px-2"><Link href="/" aria-label="Nomi website"><NomiWordmark width={112} variant="purple" label="Nomi" /></Link></div> : null}
       <nav className="flex-1 space-y-1.5">
         {navItems.map((item) => {
           const isActive = active === item.label;
