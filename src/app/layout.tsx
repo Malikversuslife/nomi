@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     description: "Nomi learns how you learn, adapting practice, guidance and support to your learning journey.",
     images: [
       {
-        url: "/brand/nomi/social/nomi-site-preview.png",
+        url: "/brand/nomi/social/nomi-website-preview.png",
         width: 1200,
         height: 630,
         alt: "Nomi learns how you learn.",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Nomi | Adaptive AI Learning Companion",
     description: "Nomi learns how you learn, adapting practice, guidance and support to your learning journey.",
-    images: ["/brand/nomi/social/nomi-site-preview.png"],
+    images: ["/brand/nomi/social/nomi-website-preview.png"],
   },
 };
 
