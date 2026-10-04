@@ -9,6 +9,7 @@ import { generatePracticeQuestion } from "@/server/ai/questions";
 import type { Json, PersistedMisconceptionState, PracticeAttempt, Subject, Topic } from "@/server/supabase/types";
 import { createServerSupabaseClient } from "@/server/supabase/server";
 import { requireUser } from "@/server/supabase/auth";
+import { getMobileCurriculum } from "@/server/data/mobile-curriculum";
 import { isGeneratedQuestionToken, openGeneratedQuestion, sealGeneratedQuestion } from "./generated-question-token";
 import { mapPracticeQuestion, toLearnerSafeQuestion } from "./questions";
 import { buildMisconceptionLifecycleInput, getMisconceptionIdentity } from "./misconceptions";
@@ -106,26 +107,34 @@ async function selectPracticeQuestionForState(input: {
   return selection.question ? toLearnerSafeQuestion(selection.question) : null;
 }
 
-export async function getInitialPracticeState(): Promise<PracticeActionState> {
+export async function getInitialPracticeState(requestedTopic?: string, subjectSlug = "mathematics"): Promise<PracticeActionState> {
   const user = await requireUser();
   const supabase = await createServerSupabaseClient();
 
-  const { data: progress } = await supabase.from("topic_progress").select("*").eq("user_id", user.id).order("updated_at", { ascending: false }).limit(1).maybeSingle();
-  const { data: fallbackRows, error } = await supabase.from("practice_questions").select("*").eq("active", true).order("difficulty", { ascending: true });
+  const curriculum = await getMobileCurriculum(user.id, subjectSlug);
+  const selectedTopic = curriculum.topics.find(
+    (topic) => topic.id === requestedTopic || topic.slug === requestedTopic,
+  ) ?? curriculum.currentTopic ?? curriculum.topics[0];
+  if (!selectedTopic) return { question: null };
 
-  if (error) {
-    throw new Error(`Unable to load practice questions: ${error.message}`);
-  }
-
-  const fallbackSelection = selectNextQuestion({ questions: fallbackRows.map(mapPracticeQuestion), targetDifficulty: progress?.difficulty ?? 2 });
-
-  if (!progress || !fallbackSelection.question) {
-    return { question: fallbackSelection.question ? toLearnerSafeQuestion(fallbackSelection.question) : null };
-  }
-
-  const { topic, subject } = await loadTopicAndSubject(supabase, progress.topic_id);
-  const question = await selectPracticeQuestionForState({ supabase, topic, subject, targetDifficulty: progress.difficulty, intervention: progress.recommended_intervention ?? "continue", recentSummary: summariseProgress(progress) });
-
+  const { topic, subject } = await loadTopicAndSubject(supabase, selectedTopic.id);
+  const { data: selectedProgress, error: selectedProgressError } = await supabase
+    .from("topic_progress").select("*").eq("user_id", user.id).eq("topic_id", topic.id).maybeSingle();
+  if (selectedProgressError) throw new Error(selectedProgressError.message);
+  const targetDifficulty = selectedProgress?.difficulty ?? 3;
+  const { data: seededRows, error: questionsError } = await supabase.from("practice_questions")
+    .select("*").eq("topic_id", topic.id).eq("active", true).order("sort_order");
+  if (questionsError) throw new Error(questionsError.message);
+  const questions = (seededRows ?? []).map(mapPracticeQuestion)
+    .sort((a, b) => Math.abs(a.difficulty - targetDifficulty) - Math.abs(b.difficulty - targetDifficulty))
+    .slice(0, 5).map((item) => toLearnerSafeQuestion(item));
+  if (questions.length) return { question: questions[0], questions };
+  const question = await selectPracticeQuestionForState({
+    supabase, topic, subject,
+    targetDifficulty,
+    intervention: selectedProgress?.recommended_intervention ?? "continue",
+    recentSummary: selectedProgress ? summariseProgress(selectedProgress) : "new learner",
+  });
   return { question };
 }
 
@@ -287,7 +296,7 @@ export async function submitPracticeAttempt(input: PracticeSubmissionInput): Pro
     throw new Error(`Unable to persist practice result: ${persistError?.message ?? "unknown error"}`);
   }
 
-  const nextQuestion = await selectPracticeQuestionForState({
+  const nextQuestion = parsed.skipNextQuestion ? null : await selectPracticeQuestionForState({
     supabase,
     topic,
     subject,

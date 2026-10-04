@@ -57,7 +57,7 @@
   --color-nomi-text-primary: var(--nomi-text-primary);
   --color-nomi-text-secondary: var(--nomi-text-secondary);
 
-  --font-display: var(--font-bricolage);
+  --font-display: var(--font-inter);
   --font-sans: var(--font-inter);
 }
 
@@ -70,14 +70,25 @@
     min-height: 100%;
     background: var(--nomi-canvas);
     color: var(--nomi-ink);
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   body {
     min-height: 100vh;
     margin: 0;
-    background: var(--nomi-canvas);
+    background:
+      radial-gradient(circle at 82% -10%, rgb(108 60 255 / 0.08), transparent 28rem),
+      var(--nomi-canvas);
     color: var(--nomi-ink);
-    font-family: var(--font-inter), system-ui, sans-serif;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    line-height: 1.45;
+  }
+
+  html,
+  body {
+    transition: background-color 180ms ease, color 180ms ease;
   }
 
   a {
@@ -92,10 +103,63 @@
     font: inherit;
   }
 
-  :focus-visible {
-    outline: 3px solid var(--nomi-purple-700);
-    outline-offset: 3px;
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
   }
+
+  input,
+  textarea,
+  select {
+    border-color: var(--nomi-border);
+    background: rgb(255 255 255 / 0.9);
+  }
+
+  ::selection {
+    background: var(--nomi-purple-100);
+    color: var(--nomi-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid rgb(108 60 255 / 0.72);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .nomi-card {
+    border: 1px solid rgb(0 0 0 / 0.055);
+    background: var(--nomi-material-strong);
+    box-shadow: var(--nomi-shadow-card);
+    backdrop-filter: blur(24px) saturate(150%);
+  }
+
+  .nomi-material {
+    background: var(--nomi-material);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+  }
+
+  .nomi-feature {
+    border: 1px solid rgb(255 255 255 / 0.7);
+    background: linear-gradient(135deg, #eeeaff 0%, #f8f6ff 62%, #ffffff 100%);
+    box-shadow: var(--nomi-shadow-card);
+  }
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 82% -10%, rgb(139 92 246 / 0.15), transparent 30rem),
+    var(--nomi-canvas);
+}
+
+:root[data-theme="dark"] .nomi-card {
+  border-color: rgb(255 255 255 / 0.075);
+}
+
+:root[data-theme="dark"] .nomi-feature {
+  border-color: rgb(255 255 255 / 0.08);
+  background: linear-gradient(135deg, #2b2344 0%, #211c31 58%, #1c1c1e 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

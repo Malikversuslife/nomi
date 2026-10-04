@@ -1,12 +1,10 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { CircleCheckIcon } from "@hugeicons/core-free-icons";
-import { AppIcon } from "@/components/ui/app-icon";
 import { NomiCharacter } from "@/components/nomi/nomi-character";
-import { SubjectIcon } from "@/components/ui/subject-icon";
 import { Subject3DVisual } from "@/components/ui/subject-visual";
-import { subjectIdentityForName, subjectIdentityForIconKey } from "@/components/ui/subject-identity";
+import { subjectIdentityForName } from "@/components/ui/subject-identity";
+import { SubjectCatalogue } from "@/components/subjects/subject-catalogue";
 import { Button } from "@/components/ui/button";
 import { FeedbackBanner } from "@/components/ui/feedback-banner";
 import type {
@@ -143,7 +141,7 @@ function SubjectStep({
   onBack: () => void;
 }) {
   return (
-    <section className="mx-auto w-full max-w-md text-center">
+    <section className="mx-auto w-full max-w-4xl text-center">
       <ProgressCue current={2} total={3} />
       <p className="mt-5 text-sm font-semibold uppercase tracking-[0.2em] text-nomi-purple-600">
         Choose your path
@@ -159,19 +157,8 @@ function SubjectStep({
         You can explore other subjects anytime.
       </p>
 
-      <div
-        role="radiogroup"
-        aria-label="Choose a subject"
-        className="mt-6 grid gap-3 text-left sm:grid-cols-2"
-      >
-        {subjects.map((subject) => (
-          <SubjectOption
-            key={subject.slug}
-            subject={subject}
-            selected={subject.slug === selectedSlug}
-            onSelect={onSelect}
-          />
-        ))}
+      <div className="mt-6 text-left">
+        <SubjectCatalogue subjects={subjects} selected={selectedSlug} onSelect={onSelect} selectionMode="onboarding" />
       </div>
 
       <div className="mt-6 flex items-center justify-center gap-3">
@@ -181,61 +168,6 @@ function SubjectStep({
         </Button>
       </div>
     </section>
-  );
-}
-
-function SubjectOption({
-  subject,
-  selected,
-  onSelect,
-}: {
-  subject: OnboardingSubjectView;
-  selected: boolean;
-  onSelect: (slug: string) => void;
-}) {
-  const identity = subjectIdentityForIconKey(subject.iconKey);
-
-  return (
-    <label
-      className={`
-        flex min-h-14 cursor-pointer items-center gap-3 rounded-[var(--nomi-radius-medium)] border p-4 transition-colors
-        focus-within:outline-none focus-within:ring-2 focus-within:ring-nomi-purple-500 focus-within:ring-offset-2
-        ${
-          selected
-            ? "border-nomi-purple-600 bg-nomi-purple-100/60 ring-1 ring-nomi-purple-600"
-            : "border-nomi-border bg-nomi-surface hover:border-nomi-purple-500"
-        }
-      `}
-    >
-      <input
-        type="radio"
-        name="subject"
-        value={subject.slug}
-        checked={selected}
-        onChange={() => onSelect(subject.slug)}
-        className="sr-only"
-      />
-      <span aria-hidden="true" className="shrink-0" style={{ color: identity.color }}>
-        <SubjectIcon iconKey={subject.iconKey} className="h-6 w-6" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-semibold text-nomi-ink">{subject.name}</span>
-        {subject.description ? (
-          <span className="block text-sm text-nomi-muted">{subject.description}</span>
-        ) : null}
-      </span>
-      {selected ? (
-        <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-nomi-purple-700">
-          <AppIcon icon={CircleCheckIcon} size={15} strokeWidth={2.5} />
-          Selected
-        </span>
-      ) : (
-        <span
-          aria-hidden="true"
-          className="h-4 w-4 shrink-0 rounded-full border border-nomi-border"
-        />
-      )}
-    </label>
   );
 }
 

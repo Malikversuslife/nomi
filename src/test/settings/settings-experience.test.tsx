@@ -3,8 +3,8 @@ import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { SettingsExperience } from "@/components/settings/settings-experience";
 import type { ProfileExperienceData } from "@/domain/profile/types";
 
@@ -35,6 +35,12 @@ function sampleData(
 }
 
 describe("SettingsExperience", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    delete document.documentElement.dataset.theme;
+    delete document.documentElement.dataset.themePreference;
+  });
+
   it("renders the learning preferences form as the editing home", () => {
     render(<SettingsExperience data={sampleData()} />);
 
@@ -61,20 +67,25 @@ describe("SettingsExperience", () => {
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
   });
 
-  it("keeps the appearance note informational only", () => {
+  it("offers light, dark, and system appearance choices", () => {
     render(<SettingsExperience data={sampleData()} />);
 
+    expect(screen.getByRole("button", { name: "Light" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "System" })).toHaveAttribute("aria-pressed", "true");
     expect(
       screen.getByText(/Nomi follows your device's reduced-motion preference automatically/i),
     ).toBeInTheDocument();
   });
 
-  it("does not mention an unavailable theme choice", () => {
-    const { container } = render(<SettingsExperience data={sampleData()} />);
-    const text = container.textContent ?? "";
+  it("applies and remembers dark mode immediately", () => {
+    render(<SettingsExperience data={sampleData()} />);
 
-    expect(text).not.toContain("light-coloured");
-    expect(text).not.toContain("dark mode");
+    fireEvent.click(screen.getByRole("button", { name: "Dark" }));
+
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(window.localStorage.getItem("nomi-theme")).toBe("dark");
+    expect(screen.getByRole("button", { name: "Dark" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("withholds features that have no real behaviour", () => {
@@ -82,7 +93,6 @@ describe("SettingsExperience", () => {
     const text = container.textContent ?? "";
 
     for (const withheld of [
-      "Dark mode",
       "Delete account",
       "Change email",
       "Notification toggles",
@@ -92,6 +102,6 @@ describe("SettingsExperience", () => {
       expect(text).not.toContain(withheld);
     }
 
-    expect(screen.queryByLabelText("Dark mode")).toBeNull();
+    expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
   });
 });

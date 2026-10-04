@@ -18,6 +18,7 @@ export type SubjectProgressView = {
 };
 
 export type TopicProgressView = {
+  id?: string;
   slug: string;
   name: string;
   subjectName: string;
@@ -27,6 +28,7 @@ export type TopicProgressView = {
 };
 
 export type NextUpView = {
+  topicId?: string;
   topicName: string;
   message: string;
   mascotKey: "supportive" | "encouraging" | "celebrating";

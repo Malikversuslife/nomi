@@ -95,10 +95,11 @@ const starting: LearnExperienceData = {
 };
 
 describe("LearnExperience", () => {
-  it("opens on the default subject and keeps the Nomi insight honest", () => {
+  it("shows the catalogue and keeps the Nomi insight honest", () => {
     const { container } = render(<LearnExperience data={continuing} />);
 
-    expect(screen.getByRole("heading", { name: "Mathematics" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Find your next subject" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mathematics" })).toBeInTheDocument();
     expect(screen.getAllByText("Factorisation").length).toBeGreaterThan(0);
     expect(screen.getByText("Nomi suggests")).toBeInTheDocument();
     expect(container.textContent).toContain(
@@ -106,14 +107,19 @@ describe("LearnExperience", () => {
     );
   });
 
-  it("switches subjects from the selector", () => {
+  it("opens subject details and its learning path in a modal", () => {
     render(<LearnExperience data={continuing} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Physics" }));
 
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Physics" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Motion" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Algebra" })).not.toBeInTheDocument();
+    expect(document.querySelector("[data-state='encouraging']")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("shows a start state instead of a recommendation when there is no progress", () => {

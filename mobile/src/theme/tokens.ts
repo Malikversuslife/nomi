@@ -8,6 +8,7 @@ export const colors = {
   slate: "#475569",
   stone: "#F2F2F7",
   cream: "#FFF9F2",
+  warmSurface: "#F5F0E9",
   white: "#FFFFFF",
 } as const;
 

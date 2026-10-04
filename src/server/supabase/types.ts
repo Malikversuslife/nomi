@@ -30,6 +30,10 @@ export type Database = {
           name: string;
           description: string | null;
           icon_key: string | null;
+          field: string;
+          search_terms: string[];
+          availability: "available" | "coming_soon";
+          artwork_kind: "3d" | "icon";
           sort_order: number;
           active: boolean;
           created_at: string;

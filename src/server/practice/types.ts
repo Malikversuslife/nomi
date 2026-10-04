@@ -21,6 +21,7 @@ export type PracticeResult = {
 
 export type PracticeActionState = {
   question?: LearnerSafePracticeQuestionWithMeta | null;
+  questions?: LearnerSafePracticeQuestionWithMeta[];
   result?: PracticeResult;
   message?: string;
 };

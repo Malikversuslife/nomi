@@ -3,7 +3,7 @@ import { MathText } from "@/components/practice/math-text";
 import { ButtonLink } from "@/components/ui/button";
 import type { TutorMessageView } from "@/domain/tutor/types";
 
-export function TutorMessage({ message }: { message: TutorMessageView }) {
+export function TutorMessage({ message, practiceHref = "/practice" }: { message: TutorMessageView; practiceHref?: string }) {
   if (message.role === "user") {
     return (
       <div className="flex justify-start">
@@ -29,7 +29,7 @@ export function TutorMessage({ message }: { message: TutorMessageView }) {
         {message.suggestedAction ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {message.suggestedAction === "practice" ? (
-              <ButtonLink href="/practice" size="sm">
+              <ButtonLink href={practiceHref} size="sm">
                 Practice this topic
               </ButtonLink>
             ) : null}

@@ -23,7 +23,7 @@ function TopicRow({ topic }: { topic: TopicProgressView }) {
         ) : null}
       </div>
       <ButtonLink
-        href="/practice"
+        href={`/practice?topic=${encodeURIComponent(topic.id ?? topic.slug)}`}
         aria-label={`${topic.state.actionLabel} ${topic.name}`}
         variant="secondary"
         size="sm"

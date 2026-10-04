@@ -24,6 +24,10 @@ export async function buildOnboardingExperience(
       name: subject.name,
       description: subject.description,
       iconKey: subject.icon_key,
+      field: subject.field,
+      searchTerms: subject.search_terms,
+      availability: subject.availability,
+      artworkKind: subject.artwork_kind,
       startingTopic: findStartingTopic(subject.name, subject.topics.map(toNode)),
     };
   });

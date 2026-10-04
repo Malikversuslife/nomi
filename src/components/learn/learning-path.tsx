@@ -11,7 +11,7 @@ function TopicRow({ topic }: { topic: LearnTopicRowView }) {
         <p className="ml-auto basis-full text-xs leading-relaxed text-nomi-muted">{topic.state.cue}</p>
       ) : null}
       <ButtonLink
-        href="/practice"
+        href={`/practice?topic=${encodeURIComponent(topic.id ?? topic.slug)}`}
         aria-label={`${topic.state.actionLabel} ${topic.name}`}
         variant="secondary"
         size="sm"

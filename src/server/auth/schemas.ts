@@ -11,6 +11,18 @@ export const signUpSchema = z.object({
   password: z.string().min(8, "Use at least 8 characters."),
 });
 
+export const recoverySchema = z.object({
+  email: z.string().email("Enter a valid email address.").trim(),
+});
+
+export const updatePasswordSchema = z.object({
+  password: z.string().min(8, "Use at least 8 characters."),
+  confirmPassword: z.string().min(1, "Confirm your new password."),
+}).refine((value) => value.password === value.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+});
+
 export type AuthFormState = {
   message?: string;
   fieldErrors?: Record<string, string[]>;

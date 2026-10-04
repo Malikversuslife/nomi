@@ -18,7 +18,7 @@ export default async function SettingsPage() {
   const data = await getProfileExperienceData(user.id, user.email ?? "");
 
   return (
-    <FoundationShell active="">
+    <FoundationShell active="Settings">
       <SettingsExperience data={data} />
     </FoundationShell>
   );

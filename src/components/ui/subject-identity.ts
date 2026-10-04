@@ -2,8 +2,14 @@ import type { IconSvgElement } from "@hugeicons/react";
 import {
   Atom02Icon,
   BookOpen01Icon,
+  BriefcaseBusinessIcon,
   Calculator01Icon,
+  Chart01Icon,
+  ComputerIcon,
   FlaskConicalIcon,
+  Globe02Icon,
+  AiTranslateIcon,
+  PaintBrush01Icon,
   Leaf04Icon,
 } from "@hugeicons/core-free-icons";
 
@@ -68,6 +74,26 @@ const ICON_KEY_TO_SUBJECT: Record<string, SubjectKey> = {
   flask: "chemistry",
   leaf: "biology",
 };
+
+export const SUBJECT_ICONS: Record<string, IconSvgElement> = {
+  atom: Atom02Icon,
+  book: BookOpen01Icon,
+  business: BriefcaseBusinessIcon,
+  calculator: Calculator01Icon,
+  chart: Chart01Icon,
+  computer: ComputerIcon,
+  economics: Chart01Icon,
+  flask: FlaskConicalIcon,
+  globe: Globe02Icon,
+  history: BookOpen01Icon,
+  language: AiTranslateIcon,
+  art: PaintBrush01Icon,
+  leaf: Leaf04Icon,
+};
+
+export function subjectIconForKey(iconKey: string | null | undefined): IconSvgElement {
+  return SUBJECT_ICONS[iconKey ?? ""] ?? BookOpen01Icon;
+}
 
 export function subjectIdentityForSlug(slug: string | null | undefined): SubjectIdentity {
   const normalized = slug?.trim().toLowerCase() ?? "";

@@ -3,20 +3,25 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import type { AuthFormState } from "@/server/auth/schemas";
+import { GoogleSignInButton } from "./google-sign-in-button";
 
 type AuthFormProps = {
   mode: "sign-in" | "sign-up";
   action: (state: AuthFormState, formData: FormData) => Promise<AuthFormState>;
+  nextPath?: string;
+  callbackError?: boolean;
 };
 
 const initialState: AuthFormState = {};
 
-export function AuthForm({ mode, action }: AuthFormProps) {
+export function AuthForm({ mode, action, nextPath, callbackError = false }: AuthFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState);
   const isSignUp = mode === "sign-up";
 
   return (
     <form action={formAction} className="space-y-4">
+      <input name="next" type="hidden" value={nextPath ?? ""} />
+      {callbackError ? <p className="rounded-[var(--nomi-radius-medium)] bg-nomi-warning-100 px-4 py-3 text-sm text-nomi-warning-700">That sign-in link is invalid or has expired. Try again or request a new recovery email.</p> : null}
       {isSignUp ? (
         <div className="space-y-2">
           <label className="text-sm font-semibold text-nomi-ink" htmlFor="displayName">
@@ -49,9 +54,13 @@ export function AuthForm({ mode, action }: AuthFormProps) {
         {pending ? "Working..." : isSignUp ? "Create account" : "Sign in"}
       </button>
 
+      <GoogleSignInButton nextPath={nextPath} />
+
+      {!isSignUp ? <p className="text-center text-sm"><Link className="font-semibold text-nomi-purple-700" href="/auth/forgot-password">Forgot password?</Link></p> : null}
+
       <p className="text-center text-sm text-nomi-muted">
         {isSignUp ? "Already have an account? " : "New to Nomi? "}
-        <Link className="font-semibold text-nomi-purple-700" href={isSignUp ? "/auth/sign-in" : "/auth/sign-up"}>
+        <Link className="font-semibold text-nomi-purple-700" href={`${isSignUp ? "/auth/sign-in" : "/auth/sign-up"}${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`}>
           {isSignUp ? "Sign in" : "Create one"}
         </Link>
       </p>

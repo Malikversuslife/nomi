@@ -1,0 +1,7 @@
+mobile/
+.next/
+node_modules/
+tsconfig.tsbuildinfo
+coverage/
+src/test/
+*.backup.txt

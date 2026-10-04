@@ -7,16 +7,38 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "backgroundColor": "#FFF9F2",
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFF9F2",
+          "image": "./assets/splash.png",
+          "imageWidth": 190
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.nomi.mobile"
+      "bundleIdentifier": "app.nomi.mobile",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "app.nomi.mobile"
     },
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fcd0c79c-bc97-44e7-8c5a-8ba9c3f566b0"
+      }
+    },
+    "owner": "heymalik",
+    "icon": "./assets/icon.png"
   }
 }

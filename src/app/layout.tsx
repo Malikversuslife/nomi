@@ -65,8 +65,11 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const themeScript = `(() => { try { const saved = localStorage.getItem('nomi-theme'); const preference = saved === 'light' || saved === 'dark' ? saved : 'system'; const dark = preference === 'dark' || (preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches); const theme = dark ? 'dark' : 'light'; document.documentElement.dataset.theme = theme; document.documentElement.dataset.themePreference = preference; document.documentElement.style.colorScheme = theme; } catch {} })();`;
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body className={`${bricolage.variable} ${inter.variable} antialiased`}>{children}</body>
     </html>
   );

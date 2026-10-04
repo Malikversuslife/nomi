@@ -1,5 +1,5 @@
 import { AppIcon } from "./app-icon";
-import { subjectIdentityForIconKey } from "./subject-identity";
+import { subjectIconForKey } from "./subject-identity";
 
 export function SubjectIcon({
   iconKey,
@@ -12,11 +12,10 @@ export function SubjectIcon({
   size?: number;
   strokeWidth?: number;
 }) {
-  const identity = subjectIdentityForIconKey(iconKey);
   return (
     <AppIcon
       className={className}
-      icon={identity.icon}
+      icon={subjectIconForKey(iconKey)}
       size={size}
       strokeWidth={strokeWidth}
     />

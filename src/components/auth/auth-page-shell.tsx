@@ -3,7 +3,7 @@ import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { NomiWordmark } from "@/components/nomi/nomi-wordmark";
 
 type AuthPageShellProps = {
-  mode: "sign-in" | "sign-up";
+  mode: "sign-in" | "sign-up" | "recovery" | "update-password";
   children: ReactNode;
 };
 
@@ -25,6 +25,12 @@ const content = {
     formDescription: "A few details and you are ready to start.",
     character: "curious" as const,
     characterLabel: "Nomi is curious",
+  },
+  recovery: {
+    eyebrow: "Account recovery", title: "Find your way back.", description: "Nomi will send a secure link to the email connected to your account.", formTitle: "Reset your password", formDescription: "Enter your email and we will send the next step.", character: "supportive" as const, characterLabel: "Nomi is supportive",
+  },
+  "update-password": {
+    eyebrow: "Almost there", title: "Choose a new password.", description: "Use a password you have not used for this account before.", formTitle: "Set a new password", formDescription: "Your recovery link has been verified.", character: "encouraging" as const, characterLabel: "Nomi is encouraging",
   },
 };
 

@@ -4,6 +4,8 @@ import { LearnExperience } from "@/components/learn/learn-experience";
 import { hasSupabaseConfig } from "@/server/env";
 import { buildLearnExperience } from "@/server/learn/presentation";
 import { requireUser } from "@/server/supabase/auth";
+import { getMobileCurriculum } from "@/server/data/mobile-curriculum";
+import { addLearnerSubjectAction } from "@/server/learn/actions";
 
 export default async function LearnPage() {
   if (!hasSupabaseConfig()) {
@@ -15,7 +17,20 @@ export default async function LearnPage() {
   }
 
   const user = await requireUser();
-  const data = await buildLearnExperience(user.id);
+  const [data, curriculum] = await Promise.all([buildLearnExperience(user.id), getMobileCurriculum(user.id)]);
+  if (curriculum.currentTopic && curriculum.subject) {
+    data.defaultSubjectSlug = curriculum.subject.slug;
+    data.continueView = {
+      kind: "continue",
+      subjectName: curriculum.subject.name,
+      parentName: curriculum.currentTopic.parentName,
+      topicName: curriculum.currentTopic.name,
+      topicSlug: curriculum.currentTopic.slug,
+      topicId: curriculum.currentTopic.id,
+      state: { key: curriculum.currentTopic.mastery > 0 ? "in-progress" : "not-started", label: `${curriculum.currentTopic.mastery}/100 mastery`, cue: null, actionLabel: "Practise" },
+    };
+    if (data.insightView?.topicName !== curriculum.currentTopic.name) data.insightView = null;
+  }
 
   if (data.subjects.length === 0) {
     return (
@@ -37,7 +52,7 @@ export default async function LearnPage() {
 
   return (
     <FoundationShell active="Learn">
-      <LearnExperience data={data} />
+      <LearnExperience data={data} addSubjectAction={addLearnerSubjectAction} mobilePath={curriculum.subject ? { subjectName: curriculum.subject.name, currentTopic: curriculum.currentTopic, topics: curriculum.topics } : undefined} />
     </FoundationShell>
   );
 }

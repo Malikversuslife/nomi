@@ -6,9 +6,9 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-nomi-purple-600 text-nomi-on-primary hover:bg-nomi-purple-700 active:bg-nomi-purple-700 disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text disabled:shadow-none",
+    "bg-nomi-purple-600 text-nomi-on-primary shadow-[0_6px_18px_rgb(108_60_255/0.22)] hover:bg-nomi-purple-700 hover:shadow-[0_8px_22px_rgb(108_60_255/0.28)] active:scale-[0.985] active:bg-nomi-purple-700 disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text disabled:shadow-none",
   secondary:
-    "border border-nomi-border bg-nomi-surface text-nomi-ink hover:border-nomi-purple-500 hover:bg-nomi-purple-100 disabled:border-transparent disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text",
+    "border border-nomi-border bg-nomi-surface/80 text-nomi-ink shadow-sm backdrop-blur-xl hover:border-nomi-border-strong hover:bg-nomi-surface-raised active:scale-[0.985] disabled:border-transparent disabled:bg-nomi-disabled-bg disabled:text-nomi-disabled-text",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -18,7 +18,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 rounded-[var(--nomi-radius-pill)] text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 rounded-[var(--nomi-radius-pill)] text-sm font-semibold tracking-[-0.01em] transition-[background-color,box-shadow,transform,border-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nomi-purple-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
 
 export function buttonClasses({
   variant = "primary",

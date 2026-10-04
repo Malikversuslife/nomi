@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { signInSchema, signUpSchema } from "@/server/auth/schemas";
+import { signInSchema, signUpSchema, updatePasswordSchema } from "@/server/auth/schemas";
 
 describe("auth schemas", () => {
   it("accepts valid sign-in input", () => {
@@ -10,5 +10,12 @@ describe("auth schemas", () => {
     const result = signUpSchema.safeParse({ displayName: "N", email: "not-email", password: "short" });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("updatePasswordSchema", () => {
+  it("requires matching passwords", () => {
+    expect(updatePasswordSchema.safeParse({ password: "newpassword", confirmPassword: "different" }).success).toBe(false);
+    expect(updatePasswordSchema.safeParse({ password: "newpassword", confirmPassword: "newpassword" }).success).toBe(true);
   });
 });

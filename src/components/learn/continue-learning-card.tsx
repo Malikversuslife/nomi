@@ -8,10 +8,12 @@ export function ContinueLearningCard({
   subject,
   currentTopic,
   nextTopic,
+  topicId,
 }: {
   subject?: string;
   currentTopic?: string;
   nextTopic?: string;
+  topicId?: string;
 }) {
   const hasData = Boolean(subject || currentTopic);
 
@@ -58,7 +60,7 @@ export function ContinueLearningCard({
         {nextTopic ? (
           <p className="mt-1 text-sm text-nomi-muted">Up next: {nextTopic}</p>
         ) : null}
-        <ButtonLink href="/practice" className="mt-4">
+        <ButtonLink href={topicId ? `/practice?topic=${encodeURIComponent(topicId)}` : "/practice"} className="mt-4">
           Continue practice
           <AppIcon icon={ArrowRight01Icon} size={16} strokeWidth={2.25} />
         </ButtonLink>

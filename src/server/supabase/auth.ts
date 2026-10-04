@@ -1,9 +1,10 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { hasSupabaseConfig } from "@/server/env";
 import { createServerSupabaseClient } from "./server";
 
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
   if (!hasSupabaseConfig()) {
     return null;
   }
@@ -16,7 +17,7 @@ export async function getCurrentUser() {
   }
 
   return data.user;
-}
+});
 
 export async function requireUser() {
   const user = await getCurrentUser();

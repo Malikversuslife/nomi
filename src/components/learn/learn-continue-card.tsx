@@ -45,10 +45,11 @@ export function LearnContinueCard({ view }: { view: LearnContinueView }) {
         </h2>
         <p className="mt-1 text-sm font-semibold text-nomi-ink">{view.state.label}</p>
 
-        <ButtonLink href="/practice" className="mt-4">
+        <ButtonLink href={view.topicId || view.topicSlug ? `/practice?topic=${encodeURIComponent(view.topicId ?? view.topicSlug ?? "")}` : "/practice"} className="mt-4">
           Continue practice
           <AppIcon icon={ArrowRight01Icon} size={16} strokeWidth={2.25} />
         </ButtonLink>
+        {view.topicId || view.topicSlug ? <ButtonLink href={`/nomi?topic=${encodeURIComponent(view.topicId ?? view.topicSlug ?? "")}`} variant="secondary" className="ml-2 mt-4">Learn with Nomi</ButtonLink> : null}
       </div>
 
       <div aria-hidden="true" className="hidden sm:block">

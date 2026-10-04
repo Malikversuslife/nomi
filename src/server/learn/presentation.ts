@@ -37,6 +37,7 @@ function buildRowView(
   mostRecentTopicId: string | null,
 ): LearnTopicRowView {
   return {
+    id: topic.id,
     slug: topic.slug,
     name: topic.name,
     state: deriveTopicState(progressMap.get(topic.id) ?? null),
@@ -94,6 +95,8 @@ function buildContinueView(
     kind: "continue",
     subjectName: subject?.name ?? "",
     topicName: topic.name,
+    topicSlug: topic.slug,
+    topicId: topic.id,
     parentName: topic.parent_topic_id
       ? topicById.get(topic.parent_topic_id)?.name ?? null
       : null,
@@ -195,11 +198,22 @@ export async function buildLearnExperience(userId: string): Promise<LearnExperie
     (learnerSubjects[0] as { subjects?: { slug?: string } | null } | null | undefined)
       ?.subjects?.slug ?? null;
 
+  const enrolledSubjectIds = new Set(
+    learnerSubjects
+      .filter((row) => row.status === "active")
+      .map((row) => row.subject_id),
+  );
+
   const subjects: LearnSubjectView[] = subjectsWithTopics.map((subject) => ({
     slug: subject.slug,
     name: subject.name,
     description: subject.description,
     iconKey: subject.icon_key,
+    field: subject.field,
+    searchTerms: subject.search_terms,
+    availability: subject.availability,
+    artworkKind: subject.artwork_kind,
+    enrolled: enrolledSubjectIds.has(subject.id),
     units: subject.topics.map((root) => buildUnitView(root, progressMap, mostRecentTopicId)),
   }));
 

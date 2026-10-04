@@ -18,16 +18,19 @@ export type FeedbackResult = {
   intervention?: string | null;
   consecutiveCorrect?: number;
   difficultyChange?: number;
+  correctAnswer?: string;
 };
 
 export function PracticeFeedback({
   result,
   onContinue,
   onRetry,
+  allowContinueOnIncorrect = false,
 }: {
   result: FeedbackResult;
   onContinue: () => void;
   onRetry: () => void;
+  allowContinueOnIncorrect?: boolean;
 }) {
   const copy = feedbackCopy(result);
   const guidance = guidanceForResult(result);
@@ -62,9 +65,10 @@ export function PracticeFeedback({
           <MathText text={guidance.text} />
         </FeedbackBanner>
       )}
+      {!result.correct && result.correctAnswer ? <p className="text-sm font-semibold text-nomi-ink">Correct answer: <MathText text={result.correctAnswer} /></p> : null}
 
       <div className="pt-1">
-        {result.correct ? (
+        {result.correct || allowContinueOnIncorrect ? (
           <Button size="lg" className="w-full" onClick={onContinue} type="button">
             Continue
             <AppIcon icon={ArrowRight01Icon} size={16} strokeWidth={2.25} />

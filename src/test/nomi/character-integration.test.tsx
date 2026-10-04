@@ -24,13 +24,13 @@ describe("Nomi character integration", () => {
     expect(container.querySelector("img[data-state]")).toHaveAttribute("data-state", "encouraging");
   });
 
-  it("uses approved wordmarks and an appropriate desktop companion for auth", () => {
+  it("uses approved wordmarks and an appropriate desktop companion for auth", async () => {
     for (const [Page, state] of [
       [SignInPage, "encouraging"],
       [SignUpPage, "curious"],
     ] as const) {
       cleanup();
-      const { container } = render(<Page />);
+      const { container } = render(await Page({ searchParams: Promise.resolve({}) }));
       expect(container.querySelector("img[data-wordmark-variant=\"inverse\"]")).toBeInTheDocument();
       expect(container.querySelector("img[data-wordmark-variant=\"purple\"]")).toBeInTheDocument();
       expect(container.querySelector("img[data-state]")).toHaveAttribute("data-state", state);

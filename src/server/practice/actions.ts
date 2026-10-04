@@ -12,6 +12,7 @@ export async function submitPracticeAttemptAction(_state: PracticeActionState, f
     submissionKey: formData.get("submissionKey"),
     learningSessionId: formData.get("learningSessionId") || null,
     responseTimeMs: formData.get("responseTimeMs") || null,
+    skipNextQuestion: formData.get("skipNextQuestion") === "true",
     learnerAnswer: questionType === "multiple_choice" ? { option_id: rawAnswer } : { value: rawAnswer },
   });
 

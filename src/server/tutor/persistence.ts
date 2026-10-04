@@ -32,12 +32,14 @@ export function toMessageView(row: PersistedTutorMessage): TutorMessageView {
   };
 }
 
-export async function getRecentTutorThread(userId: string) {
+export async function getRecentTutorThread(userId: string, topicProgressId?: string | null) {
   const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("tutor_threads")
-    .select("id,title")
-    .eq("user_id", userId)
+    .select("id,title,topic_progress_id")
+    .eq("user_id", userId);
+  if (topicProgressId !== undefined) query = topicProgressId ? query.eq("topic_progress_id", topicProgressId) : query.is("topic_progress_id", null);
+  const { data, error } = await query
     .order("updated_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -53,7 +55,7 @@ export async function getOwnedTutorThread(threadId: string, userId: string) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("tutor_threads")
-    .select("id,title")
+    .select("id,title,topic_progress_id")
     .eq("id", threadId)
     .eq("user_id", userId)
     .maybeSingle();

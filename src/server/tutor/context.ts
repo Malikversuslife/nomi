@@ -10,23 +10,25 @@ export type TutorServerContext = {
   title: string;
 };
 
-export async function buildTutorContext(userId: string): Promise<TutorServerContext> {
+export async function buildTutorContext(userId: string, preferredTopicId?: string): Promise<TutorServerContext> {
   const supabase = await createServerSupabaseClient();
-
-  const { data: progress } = await supabase
-    .from("topic_progress")
-    .select("*")
-    .eq("user_id", userId)
-    .order("updated_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const progressQuery = supabase.from("topic_progress").select("*").eq("user_id", userId);
+  const { data: progress } = preferredTopicId
+    ? await progressQuery.eq("topic_id", preferredTopicId).maybeSingle()
+    : await progressQuery.order("updated_at", { ascending: false }).limit(1).maybeSingle();
 
   if (!progress) {
+    const { data: selectedTopic } = preferredTopicId
+      ? await supabase.from("topics").select("id,name,subject_id").eq("id", preferredTopicId).eq("active", true).maybeSingle()
+      : { data: null };
+    const { data: selectedSubject } = selectedTopic
+      ? await supabase.from("subjects").select("name").eq("id", selectedTopic.subject_id).maybeSingle()
+      : { data: null };
     return {
-      client: { subjectName: null, topicName: null },
-      input: {},
+      client: { subjectName: selectedSubject?.name ?? null, topicName: selectedTopic?.name ?? null },
+      input: { subjectName: selectedSubject?.name ?? null, topicName: selectedTopic?.name ?? null },
       topicProgressId: null,
-      title: "General tutor",
+      title: selectedTopic?.name ?? "General tutor",
     };
   }
 
@@ -37,8 +39,7 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
       .select("is_correct")
       .eq("topic_progress_id", progress.id)
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .limit(5),
     supabase
       .from("misconception_state")
       .select("category,status")
@@ -62,6 +63,8 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
     subjectName = subject?.name ?? null;
   }
 
+  const recentAttempts = attemptResult.data ?? [];
+  const recentCorrectCount = recentAttempts.filter((attempt) => attempt.is_correct === true).length;
   const input: TutorContextInput = {
     subjectName,
     topicName: topicResult.data?.name ?? null,
@@ -71,16 +74,14 @@ export async function buildTutorContext(userId: string): Promise<TutorServerCont
     intervention: progress.recommended_intervention,
     misconceptionCategory: misconceptionResult.data?.category ?? null,
     misconceptionStatus: misconceptionResult.data?.status ?? null,
-    recentPracticeCorrect:
-      attemptResult.data && typeof attemptResult.data.is_correct === "boolean"
-        ? attemptResult.data.is_correct
-        : null,
+    recentPracticeCorrect: recentAttempts[0]?.is_correct ?? null,
+    recentPracticeSummary: recentAttempts.length ? `${recentCorrectCount} of ${recentAttempts.length} latest ${topicResult.data?.name ?? "topic"} answers correct` : null,
   };
 
   const topicName = input.topicName;
 
   return {
-    client: { subjectName, topicName: topicName ?? null },
+    client: { subjectName, topicName: topicName ?? null, mastery: progress.mastery, difficulty: progress.difficulty, recentAccuracy: progress.recent_accuracy, recentAttemptCount: recentAttempts.length, recentCorrectCount },
     input,
     topicProgressId: progress.id,
     title: topicName ? `${topicName}` : "General tutor",

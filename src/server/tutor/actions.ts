@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { generateTutorResponse } from "@/server/ai/tutor";
+import { fallbackTutorReply } from "@/domain/tutor/fallback";
 import { getConfiguredAiProvider } from "@/server/ai/provider";
 import { requireUser } from "@/server/supabase/auth";
 import type { TutorConversationTurn, TutorInitialData } from "@/domain/tutor/types";
@@ -21,9 +22,9 @@ const sendMessageSchema = z.object({
   threadId: z.string().nullable().optional(),
 });
 
-export async function loadTutorInitialData(userId: string): Promise<TutorInitialData> {
-  const context = await buildTutorContext(userId);
-  const thread = await getRecentTutorThread(userId);
+export async function loadTutorInitialData(userId: string, topicId?: string): Promise<TutorInitialData> {
+  const context = await buildTutorContext(userId, topicId);
+  const thread = topicId && !context.topicProgressId ? null : await getRecentTutorThread(userId, topicId ? context.topicProgressId : undefined);
 
   if (!thread) {
     return { threadId: null, messages: [], context: context.client };
@@ -41,6 +42,7 @@ export async function loadTutorInitialData(userId: string): Promise<TutorInitial
 export async function sendTutorMessageAction(input: {
   message: string;
   threadId?: string | null;
+  topicId?: string;
 }): Promise<TutorActionResult> {
   const parsed = sendMessageSchema.safeParse(input);
 
@@ -49,21 +51,20 @@ export async function sendTutorMessageAction(input: {
   }
 
   const user = await requireUser();
-  const context = await buildTutorContext(user.id);
+  const context = await buildTutorContext(user.id, input.topicId);
 
   try {
     let thread = parsed.data.threadId
       ? await getOwnedTutorThread(parsed.data.threadId, user.id)
       : null;
-    thread ??= await getRecentTutorThread(user.id);
+    if (input.topicId && thread && (context.topicProgressId
+      ? thread.topic_progress_id !== context.topicProgressId
+      : thread.topic_progress_id !== null || thread.title !== context.title)) thread = null;
+    thread ??= input.topicId && !context.topicProgressId ? null : await getRecentTutorThread(user.id, input.topicId ? context.topicProgressId : undefined);
     thread ??= await (async () => {
       const id = await createTutorThread(user.id, context.title, context.topicProgressId);
-      return { id, title: context.title };
+      return { id, title: context.title, topic_progress_id: context.topicProgressId };
     })();
-
-    if (!getConfiguredAiProvider()) {
-      return { ok: false, error: "unavailable" };
-    }
 
     const persisted = await listTutorMessages(thread.id, 12);
     const transcript: TutorConversationTurn[] = persisted.map((message) => ({
@@ -71,15 +72,12 @@ export async function sendTutorMessageAction(input: {
       content: message.content,
     }));
 
-    const response = await generateTutorResponse({
+    const generatedResponse = getConfiguredAiProvider() ? await generateTutorResponse({
       context: context.input,
       transcript,
       message: parsed.data.message,
-    });
-
-    if (!response) {
-      return { ok: false, error: "failed" };
-    }
+    }) : null;
+    const response = generatedResponse ?? fallbackTutorReply(parsed.data.message, context.client.topicName ?? "Factorisation", context.client.mastery ?? 0, context.client.difficulty ?? 1);
 
     await appendTutorMessages(thread.id, user.id, [
       { role: "user", content: parsed.data.message },

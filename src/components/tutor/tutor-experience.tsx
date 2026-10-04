@@ -19,7 +19,7 @@ const promptSuggestions = [
   "What should I review?",
 ];
 
-export function TutorExperience({ initialData }: { initialData: TutorInitialData }) {
+export function TutorExperience({ initialData, topicId }: { initialData: TutorInitialData; topicId?: string }) {
   const [messages, setMessages] = useState<TutorMessageView[]>(initialData.messages);
   const [threadId, setThreadId] = useState<string | null>(initialData.threadId);
   const [context, setContext] = useState(initialData.context);
@@ -64,7 +64,7 @@ export function TutorExperience({ initialData }: { initialData: TutorInitialData
     setLastSent(value);
 
     try {
-      const result = await sendTutorMessageAction({ message: value, threadId });
+      const result = await sendTutorMessageAction({ message: value, threadId, topicId });
 
       if (result.ok) {
         setMessages(result.messages);
@@ -85,10 +85,10 @@ export function TutorExperience({ initialData }: { initialData: TutorInitialData
   const chip = tutorContextChip(context);
 
   return (
-    <div className="mx-auto w-full max-w-[760px]">
+    <div className="mx-auto w-full max-w-[820px]">
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-5">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-[-0.04em] text-nomi-ink sm:text-4xl">
+          <h1 className="font-display text-[2.25rem] font-semibold tracking-[-0.045em] text-nomi-ink sm:text-[2.75rem]">
             Learn with Nomi
           </h1>
           <p className="mt-1 text-sm text-nomi-muted">
@@ -97,6 +97,15 @@ export function TutorExperience({ initialData }: { initialData: TutorInitialData
         </div>
         {chip ? <ContextChip>{chip}</ContextChip> : null}
       </header>
+
+      {context.topicName ? (
+        <section className="nomi-feature mb-6 rounded-[var(--nomi-radius-feature)] p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-nomi-purple-600">Current context</p>
+          <p className="mt-1 font-display text-xl font-bold text-nomi-ink">{context.topicName}</p>
+          {context.mastery != null ? <p className="mt-2 text-sm text-nomi-muted">{context.mastery}/100 mastery · Level {context.difficulty ?? 1} · {context.recentAccuracy ?? 0}% recent accuracy</p> : null}
+          {context.recentAttemptCount ? <p className="mt-1 text-sm font-semibold text-nomi-purple-600">Recent assessed Practice · {context.recentCorrectCount}/{context.recentAttemptCount} correct</p> : null}
+        </section>
+      ) : null}
 
       {!started ? (
         <TutorEmptyState
@@ -109,14 +118,14 @@ export function TutorExperience({ initialData }: { initialData: TutorInitialData
       ) : (
         <div role="log" aria-label="Tutor conversation" className="space-y-4">
           {visibleMessages.map((message) => (
-            <TutorMessage key={message.id} message={message} />
+            <TutorMessage key={message.id} message={message} practiceHref={topicId ? `/practice?topic=${encodeURIComponent(topicId)}` : "/practice"} />
           ))}
           {pending ? <TutorLoading /> : null}
           <div ref={endRef} className="scroll-mb-[calc(var(--nomi-safe-bottom)+14rem)]" />
         </div>
       )}
 
-      <div className="sticky bottom-[calc(4.5rem+var(--nomi-safe-bottom))] z-30 mt-4 border-t border-nomi-border bg-nomi-background pt-3 pb-1 lg:bottom-0">
+      <div className="nomi-material sticky bottom-[calc(1rem+var(--nomi-safe-bottom))] z-30 mt-5 rounded-[var(--nomi-radius-feature)] border border-black/[0.06] p-3 shadow-[0_14px_42px_rgb(0_0_0/0.1)] lg:bottom-4">
         {error ? (
           <TutorError
             onRetry={() => {

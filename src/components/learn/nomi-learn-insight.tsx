@@ -1,7 +1,8 @@
 import { NomiCharacter } from "@/components/nomi/nomi-character";
 import type { LearnInsightView } from "@/domain/learn/types";
+import { ButtonLink } from "@/components/ui/button";
 
-export function NomiLearnInsight({ view }: { view: LearnInsightView }) {
+export function NomiLearnInsight({ view, topicSlug }: { view: LearnInsightView; topicSlug?: string }) {
   return (
     <section className="flex items-start gap-3 rounded-[var(--nomi-radius-large)] border border-nomi-border bg-nomi-surface-subtle px-4 py-4">
       <NomiCharacter state="curious" size={36} className="mt-0.5 flex-shrink-0" />
@@ -10,6 +11,7 @@ export function NomiLearnInsight({ view }: { view: LearnInsightView }) {
           Nomi suggests
         </p>
         <p className="mt-1 text-sm font-medium leading-relaxed text-nomi-ink">{view.message}</p>
+        <ButtonLink href={topicSlug ? `/nomi?topic=${encodeURIComponent(topicSlug)}` : "/nomi"} variant="secondary" size="sm" className="mt-3">Talk it through</ButtonLink>
       </div>
     </section>
   );

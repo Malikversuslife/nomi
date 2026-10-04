@@ -5,10 +5,10 @@
   --nomi-yellow-500: #ffd43b;
   --nomi-pink-500: #ff8aae;
   --nomi-purple-100: #e9e6ff;
-  --nomi-ink: #111827;
-  --nomi-muted: #475569;
-  --nomi-stone: #f2f2f7;
-  --nomi-background: #fff9f2;
+  --nomi-ink: #1d1d1f;
+  --nomi-muted: #6e6e73;
+  --nomi-stone: #f5f5f7;
+  --nomi-background: #f5f5f7;
   --nomi-surface: #ffffff;
 
   /* Derived tones: these preserve contrast or create controlled depth without
@@ -16,20 +16,20 @@
   --nomi-purple-700: #4c1dcc;
   --nomi-purple-500: #8b6cff;
   --nomi-purple-200: #f1eeff;
-  --nomi-purple-50: #f7f5ff;
+  --nomi-purple-50: #f5f3ff;
   --nomi-mint-700: #004d3a;
   --nomi-mint-100: #ddf9f0;
   --nomi-yellow-700: #7a4a00;
   --nomi-yellow-100: #fff5cc;
   --nomi-pink-700: #a32655;
   --nomi-pink-100: #ffe5ed;
-  --nomi-border: #e6e4ec;
+  --nomi-border: #d9d9df;
 
   --nomi-on-primary: #ffffff;
-  --nomi-surface-subtle: var(--nomi-stone);
+  --nomi-surface-subtle: #f5f5f7;
   --nomi-surface-raised: #ffffff;
-  --nomi-border-subtle: #efedf4;
-  --nomi-border-strong: #d6d2e0;
+  --nomi-border-subtle: #e8e8ed;
+  --nomi-border-strong: #c7c7cc;
 
   --nomi-disabled-bg: #e7e2ea;
   --nomi-disabled-text: #99929e;
@@ -53,10 +53,15 @@
   --nomi-biology-soft: #eaf6e5;
 
   --nomi-radius-small: 10px;
-  --nomi-radius-medium: 14px;
+  --nomi-radius-medium: 13px;
   --nomi-radius-large: 18px;
-  --nomi-radius-feature: 24px;
+  --nomi-radius-feature: 28px;
   --nomi-radius-pill: 999px;
+
+  --nomi-shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 10px 30px rgb(0 0 0 / 0.055);
+  --nomi-shadow-float: 0 18px 48px rgb(0 0 0 / 0.14);
+  --nomi-material: rgb(255 255 255 / 0.82);
+  --nomi-material-strong: rgb(255 255 255 / 0.94);
 
   --nomi-safe-bottom: env(safe-area-inset-bottom, 0px);
   --nomi-safe-left: env(safe-area-inset-left, 0px);
@@ -73,4 +78,52 @@
   --nomi-canvas: var(--nomi-background);
   --nomi-text-primary: var(--nomi-ink);
   --nomi-text-secondary: var(--nomi-muted);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --nomi-purple-700: #a78bfa;
+  --nomi-purple-600: #8b5cf6;
+  --nomi-purple-500: #a78bfa;
+  --nomi-purple-200: #3b2d63;
+  --nomi-purple-100: #2b2344;
+  --nomi-purple-50: #211b33;
+
+  --nomi-ink: #f5f5f7;
+  --nomi-muted: #a1a1a6;
+  --nomi-stone: #1c1c1e;
+  --nomi-background: #0f0f11;
+  --nomi-surface: #1c1c1e;
+  --nomi-on-primary: #ffffff;
+  --nomi-surface-subtle: #242426;
+  --nomi-surface-raised: #2c2c2e;
+  --nomi-border: #38383a;
+  --nomi-border-subtle: #2c2c2e;
+  --nomi-border-strong: #48484a;
+
+  --nomi-disabled-bg: #2c2c2e;
+  --nomi-disabled-text: #6e6e73;
+  --nomi-success-500: #46d7a5;
+  --nomi-success-100: #153b31;
+  --nomi-warning-500: #ffd55a;
+  --nomi-warning-100: #413719;
+  --nomi-error-500: #ff8fa9;
+  --nomi-error-100: #43232d;
+  --nomi-info-500: #7ba5ff;
+  --nomi-info-100: #1e2c4c;
+
+  --nomi-math: #86a2ff;
+  --nomi-math-soft: #1e2b4b;
+  --nomi-physics: #ffb66d;
+  --nomi-physics-soft: #3c2b1b;
+  --nomi-chemistry: #52d2c2;
+  --nomi-chemistry-soft: #173936;
+  --nomi-biology: #91cf83;
+  --nomi-biology-soft: #233820;
+
+  --nomi-shadow-card: 0 1px 1px rgb(255 255 255 / 0.035), 0 14px 36px rgb(0 0 0 / 0.28);
+  --nomi-shadow-float: 0 20px 56px rgb(0 0 0 / 0.5);
+  --nomi-material: rgb(28 28 30 / 0.82);
+  --nomi-material-strong: rgb(30 30 32 / 0.94);
 }

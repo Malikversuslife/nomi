@@ -6,6 +6,7 @@ export const practiceSubmissionSchema = z.object({
   learningSessionId: z.string().uuid().optional().nullable(),
   submissionKey: z.string().uuid(),
   responseTimeMs: z.coerce.number().int().min(0).max(60 * 60 * 1000).optional().nullable(),
+  skipNextQuestion: z.boolean().optional(),
 });
 
 export type PracticeSubmissionInput = z.infer<typeof practiceSubmissionSchema>;

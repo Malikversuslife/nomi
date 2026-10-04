@@ -17,6 +17,11 @@ export type TutorMessageView = {
 export type TutorClientContext = {
   subjectName: string | null;
   topicName: string | null;
+  mastery?: number | null;
+  difficulty?: number | null;
+  recentAccuracy?: number | null;
+  recentAttemptCount?: number;
+  recentCorrectCount?: number;
 };
 
 export type TutorContextInput = {
@@ -28,6 +33,7 @@ export type TutorContextInput = {
   misconceptionCategory?: string | null;
   misconceptionStatus?: string | null;
   recentPracticeCorrect?: boolean | null;
+  recentPracticeSummary?: string | null;
 };
 
 export type TutorConversationTurn = {

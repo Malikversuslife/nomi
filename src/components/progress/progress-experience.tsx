@@ -8,11 +8,11 @@ import { TopicProgress } from "./topic-progress";
 
 export function ProgressExperience({ data }: { data: ProgressExperienceData }) {
   const header = (
-    <header>
-      <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-nomi-ink sm:text-5xl">
+    <header className="max-w-3xl">
+      <h1 className="font-display text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.05em] text-nomi-ink sm:text-[3.5rem]">
         See how you&apos;re growing
       </h1>
-      <p className="mt-2 text-sm text-nomi-muted">
+      <p className="mt-3 text-base leading-7 text-nomi-muted">
         Track what you&apos;ve been practising and see where to focus next.
       </p>
     </header>
@@ -47,7 +47,7 @@ export function ProgressExperience({ data }: { data: ProgressExperienceData }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-[900px] space-y-8">
       {header}
 
       {data.overview ? <ProgressOverview overview={data.overview} /> : null}

@@ -66,6 +66,7 @@ export function deriveTopicViews(
   topics: ProgressTopicEvidence[],
 ): TopicProgressView[] {
   return topics.map((topic) => ({
+    id: topic.topicId,
     slug: topic.slug,
     name: topic.name,
     subjectName: topic.subjectName,
@@ -165,6 +166,7 @@ export function buildNextUp(
       target.name,
     );
     return {
+      topicId: target.id,
       topicName: target.name,
       message: mapped ?? `${target.name} needs a little more practice.`,
       mascotKey: "supportive",
@@ -173,6 +175,7 @@ export function buildNextUp(
 
   if (target.state.key === "in-progress") {
     return {
+      topicId: target.id,
       topicName: target.name,
       message: `You're building confidence with ${target.name}. One more round could help it stick.`,
       mascotKey: "encouraging",
@@ -180,6 +183,7 @@ export function buildNextUp(
   }
 
   return {
+    topicId: target.id,
     topicName: target.name,
     message: `You're doing well with ${target.name}. Try another topic when you're ready.`,
     mascotKey: "celebrating",

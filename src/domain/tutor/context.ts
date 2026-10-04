@@ -82,6 +82,7 @@ export function buildTutorContextText(input: TutorContextInput): string {
   } else if (input.recentPracticeCorrect === false) {
     rows.push("Recent practice result: the last answer was marked incorrect.");
   }
+  if (input.recentPracticeSummary) rows.push(`Assessed practice evidence: ${input.recentPracticeSummary}`);
 
   const misconception = misconceptionContextPhrase(
     input.misconceptionCategory,

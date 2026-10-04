@@ -1,6 +1,7 @@
 import type { LearnTopicStatePresentation } from "./topic-state";
 
 export type LearnTopicRowView = {
+  id?: string;
   slug: string;
   name: string;
   state: LearnTopicStatePresentation;
@@ -26,6 +27,11 @@ export type LearnSubjectView = {
   name: string;
   description: string | null;
   iconKey: string | null;
+  field?: string;
+  searchTerms?: string[];
+  availability?: "available" | "coming_soon";
+  artworkKind?: "3d" | "icon";
+  enrolled?: boolean;
   units: LearnUnitView[];
 };
 
@@ -36,6 +42,8 @@ export type LearnContinueView =
       subjectName: string;
       parentName: string | null;
       topicName: string;
+      topicSlug?: string;
+      topicId?: string;
       state: LearnTopicStatePresentation;
     };
 

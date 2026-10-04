@@ -14,6 +14,10 @@ export type OnboardingSubjectView = {
   name: string;
   description: string | null;
   iconKey: string | null;
+  field?: string;
+  searchTerms?: string[];
+  availability?: "available" | "coming_soon";
+  artworkKind?: "3d" | "icon";
   startingTopic: OnboardingStartingTopic | null;
 };
 

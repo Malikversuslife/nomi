@@ -5,9 +5,9 @@ const baseClasses =
 
 const variantClasses: Record<"secondary" | "primary", string> = {
   secondary:
-    "border-nomi-border bg-nomi-surface text-nomi-muted hover:bg-nomi-purple-100 hover:text-nomi-purple-700",
+    "border-nomi-border bg-nomi-surface/80 text-nomi-muted shadow-sm backdrop-blur-xl hover:bg-nomi-surface-raised hover:text-nomi-purple-700 active:scale-95",
   primary:
-    "border-transparent bg-nomi-purple-600 text-nomi-on-primary hover:bg-nomi-purple-700 active:bg-nomi-purple-700",
+    "border-transparent bg-nomi-purple-600 text-nomi-on-primary shadow-[0_5px_16px_rgb(108_60_255/0.2)] hover:bg-nomi-purple-700 active:scale-95 active:bg-nomi-purple-700",
 };
 
 export function iconButtonClasses(

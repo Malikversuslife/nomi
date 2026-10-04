@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { Button } from "@/components/ui/button";
 import { updateProfileSettingsAction } from "@/server/profile/actions";
 import { ProfilePreferencesForm } from "@/components/profile/profile-preferences-form";
+import { ThemeControl } from "@/components/settings/theme-control";
 
 function DetailRow({
   label,
@@ -85,7 +86,8 @@ export function SettingsExperience({
 
       <section>
         <SectionHeader eyebrow="Appearance" title="Look and feel" />
-        <div className="mt-4">
+        <div className="nomi-card mt-4 space-y-5 rounded-[var(--nomi-radius-large)] p-5">
+          <ThemeControl />
           <FeedbackBanner variant="info">
             Nomi follows your device&apos;s reduced-motion preference automatically.
           </FeedbackBanner>

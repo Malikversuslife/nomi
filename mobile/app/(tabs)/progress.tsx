@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useLearnerSession } from "@/auth/LearnerSessionContext";
 import { usePracticeProgress } from "@/progress/PracticeProgressContext";
@@ -8,11 +8,12 @@ import { colors, radius, spacing } from "@/theme/tokens";
 const lifecycle = ["Noticed", "Recurring", "Improving", "Resolved"] as const;
 
 export default function ProgressScreen() {
-  const { configured, loading, user, displayName, error, signIn, signOut } = useLearnerSession();
+  const router = useRouter();
+  const { configured, user, displayName, signOut } = useLearnerSession();
   const { latestSession, mastery, masterySource, misconception, syncing, syncError } = usePracticeProgress();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
+  const progressTopic = latestSession?.topic ?? "Current topic";
+  const misconceptionTitle = misconception?.category?.replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) ?? "Learning pattern";
   const sourceLabel = syncing ? "Syncing learner data" : masterySource === "supabase" ? "Live learner data" : masterySource === "new-learner" ? "No practice recorded yet" : "Prototype state";
   const misconceptionStage = misconception?.status === "active" ? "Noticed" : misconception?.status === "recurring" ? "Recurring" : misconception?.status === "improving" ? "Improving" : "Resolved";
 
@@ -27,18 +28,18 @@ export default function ProgressScreen() {
           <View style={styles.syncCard}>
             <Text style={styles.syncTitle}>Sync your learner progress</Text>
             <Text style={styles.syncBody}>{configured ? "Sign in with the same Nomi account you use on the web." : "Mobile Supabase environment variables are not configured yet."}</Text>
-            {configured ? <><TextInput autoCapitalize="none" keyboardType="email-address" placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} /><TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />{error ? <Text style={styles.error}>{error}</Text> : null}<Pressable disabled={loading || !email || !password} onPress={() => void signIn(email.trim(), password)} style={[styles.syncButton, (loading || !email || !password) && styles.disabled]}><Text style={styles.syncButtonText}>{loading ? "Signing in..." : "Sign in & sync"}</Text></Pressable></> : null}
+            {configured ? <Pressable onPress={() => router.push("/auth")} style={styles.syncButton}><Text style={styles.syncButtonText}>Sign in or create account</Text></Pressable> : null}
           </View>
         ) : (
-          <View style={styles.accountRow}><View><Text style={styles.accountLabel}>SYNCED LEARNER</Text><Text style={styles.accountName}>{displayName ?? user.email ?? "Nomi learner"}</Text></View><Pressable onPress={() => void signOut()}><Text style={styles.signOut}>Sign out</Text></Pressable></View>
+          <View style={styles.accountRow}><View><Text style={styles.accountLabel}>SYNCED LEARNER</Text><Text style={styles.accountName}>{displayName ?? user.email ?? "Nomi learner"}</Text></View><Pressable onPress={() => { void signOut(); }}><Text style={styles.signOut}>Sign out</Text></Pressable></View>
         )}
 
-        <View style={styles.masteryCard}><View><Text style={styles.metricLabel}>Factorisation mastery</Text><Text style={styles.masteryValue}>{syncing ? "…" : mastery}</Text></View><View style={styles.masteryMeta}><Text style={styles.masteryScale}>/ 100</Text><Text style={styles.source}>{sourceLabel}</Text></View></View>
+        <View style={styles.masteryCard}><View><Text style={styles.metricLabel}>{progressTopic} mastery</Text><Text style={styles.masteryValue}>{syncing ? "…" : mastery}</Text></View><View style={styles.masteryMeta}><Text style={styles.masteryScale}>/ 100</Text><Text style={styles.source}>{sourceLabel}</Text></View></View>
 
         {misconception ? (
           <View style={styles.insightCard}>
             <Text style={styles.insightEyebrow}>WHAT NOMI HAS NOTICED</Text>
-            <View style={styles.insightHeader}><View style={styles.insightCopy}><Text style={styles.insightTitle}>Common factor selection</Text><Text style={styles.insightBody}>{misconception.message}</Text></View><View style={styles.stateBadge}><Text style={styles.stateBadgeText}>{misconceptionStage}</Text></View></View>
+            <View style={styles.insightHeader}><View style={styles.insightCopy}><Text style={styles.insightTitle}>{misconceptionTitle}</Text><Text style={styles.insightBody}>{misconception.message}</Text></View><View style={styles.stateBadge}><Text style={styles.stateBadgeText}>{misconceptionStage}</Text></View></View>
             <Text style={styles.evidenceText}>{misconception.occurrenceCount} misconception {misconception.occurrenceCount === 1 ? "signal" : "signals"} recorded</Text>
             <View style={styles.lifecycleRow}>{lifecycle.map((stage, index) => <View key={stage} style={styles.lifecycleItem}><View style={[styles.lifecycleDot, stage === misconceptionStage && styles.lifecycleDotActive]}><Text style={[styles.lifecycleNumber, stage === misconceptionStage && styles.lifecycleNumberActive]}>{index + 1}</Text></View><Text style={[styles.lifecycleLabel, stage === misconceptionStage && styles.lifecycleLabelActive]}>{stage}</Text></View>)}</View>
           </View>

@@ -4,6 +4,8 @@ import { useActionState, useState } from "react";
 import { NomiCharacter } from "@/components/nomi/nomi-character";
 import { submitPracticeAttemptAction } from "@/server/practice/actions";
 import type { PracticeActionState } from "@/server/practice/types";
+import type { PracticeResult } from "@/server/practice/types";
+import type { CurrentTopic } from "@/server/data/mobile-curriculum";
 import type { LearnerSafePracticeQuestionWithMeta } from "@/server/practice/questions";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { FeedbackBanner } from "@/components/ui/feedback-banner";
@@ -26,7 +28,7 @@ function newSubmissionKey() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-export function PracticeSession({ initialState }: { initialState: PracticeActionState }) {
+export function PracticeSession({ initialState, topic, subjectName }: { initialState: PracticeActionState; topic: CurrentTopic | null; subjectName: string }) {
   const [state, formAction, isPending] = useActionState(
     submitPracticeAttemptAction,
     initialState,
@@ -38,6 +40,9 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
   const [textAnswer, setTextAnswer] = useState("");
   const [submissionKey, setSubmissionKey] = useState(() => newSubmissionKey());
   const [answeredCount, setAnsweredCount] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  const [lastResult, setLastResult] = useState<PracticeResult | null>(null);
   const [submittedForQuestionId, setSubmittedForQuestionId] = useState<string | null>(null);
   const [persistedGuidance, setPersistedGuidance] = useState<PracticeGuidance | null>(null);
 
@@ -49,6 +54,37 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
     !state.result &&
     submittedForQuestionId === currentQuestionId &&
     !isPending;
+
+  if (completed) {
+    const mastered = correctCount >= 4 && (lastResult?.mastery ?? 0) >= 80;
+    return (
+      <section className="mx-auto flex max-w-[560px] flex-col items-center rounded-[var(--nomi-radius-feature)] bg-nomi-surface px-6 py-10 text-center shadow-sm">
+        <NomiCharacter state={mastered ? "celebrating" : "supportive"} size={104} />
+        <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-nomi-purple-600">{mastered ? "Topic mastered" : "Practice complete"}</p>
+        <h1 className="mt-2 font-display text-3xl font-bold text-nomi-ink">{mastered ? `You've mastered ${topic?.name ?? "this topic"}.` : `Let's strengthen ${topic?.name ?? "this topic"}.`}</h1>
+        <p className="mt-4 text-lg font-bold text-nomi-purple-600">{correctCount} / {answeredCount} correct · {lastResult?.mastery ?? 0}/100 mastery</p>
+        <div className="mt-6 w-full rounded-[var(--nomi-radius-large)] bg-nomi-purple-50 p-5 text-left">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-nomi-purple-600">Nomi adapted</p>
+          <p className="mt-2 text-sm leading-relaxed text-nomi-muted">Nomi will use your answers and recent mistakes to shape what comes next.</p>
+        </div>
+        <ButtonLink href={mastered ? "/learn" : `/nomi?topic=${encodeURIComponent(topic?.id ?? "")}`} className="mt-7 w-full justify-center">
+          {mastered ? "See what's next" : "Review weak spots with Nomi"}
+        </ButtonLink>
+        <Button variant="secondary" className="mt-3 w-full justify-center" onClick={() => {
+          setQuestion(initialState.question ?? null);
+          setAnsweredCount(0);
+          setCorrectCount(0);
+          setCompleted(false);
+          setLastResult(null);
+          setSubmittedForQuestionId(null);
+          setSelectedId("");
+          setTextAnswer("");
+          setPersistedGuidance(null);
+          setSubmissionKey(newSubmissionKey());
+        }}>Practice again</Button>
+      </section>
+    );
+  }
 
   if (!question) {
     const wrappedUp = answeredCount > 0;
@@ -90,18 +126,29 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
   }
 
   function handleContinue() {
-    const next = state.result?.nextQuestion ?? null;
+    const count = answeredCount + 1;
+    const next = initialState.questions?.[count] ?? state.result?.nextQuestion ?? null;
+    setAnsweredCount(count);
+    if (state.result?.correct) setCorrectCount((value) => value + 1);
+    setLastResult(state.result ?? null);
+    if (count >= 5 || !next) {
+      setCompleted(true);
+      return;
+    }
     setQuestion(next);
     setSubmittedForQuestionId(null);
     setSelectedId("");
     setTextAnswer("");
     setPersistedGuidance(null);
     setSubmissionKey(newSubmissionKey());
-    setAnsweredCount((count) => count + 1);
   }
 
   return (
     <div className="mx-auto max-w-[640px]">
+      <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-[0.12em] text-nomi-purple-600">
+        <span>{subjectName} · {topic?.name ?? question.conceptName}</span>
+        <span>Question {answeredCount + 1} of 5 · Level {question.difficulty}</span>
+      </div>
       <PracticeHeader conceptName={question.conceptName} />
 
       <form
@@ -112,6 +159,7 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
         <input name="questionId" type="hidden" value={question.id} />
         <input name="questionType" type="hidden" value={question.questionType} />
         <input name="submissionKey" type="hidden" value={submissionKey} />
+        <input name="skipNextQuestion" type="hidden" value={initialState.questions?.length === 5 ? "true" : "false"} />
 
         <div className="space-y-6">
           <h2 className="font-display text-2xl font-bold leading-snug tracking-[-0.02em] text-nomi-ink sm:text-[1.7rem]">
@@ -179,9 +227,10 @@ export function PracticeSession({ initialState }: { initialState: PracticeAction
       {submitted && state.result && (
         <div className="mt-6">
           <PracticeFeedback
+            allowContinueOnIncorrect
             onContinue={handleContinue}
             onRetry={handleRetry}
-            result={state.result}
+            result={{ ...state.result, correctAnswer: question.options?.find((option) => option.id === state.result?.correctAnswer)?.label ?? state.result.correctAnswer }}
           />
         </div>
       )}

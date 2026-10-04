@@ -30,7 +30,7 @@ export function NextUp({ view }: { view: NextUpView }) {
         </p>
       </div>
 
-      <ButtonLink href="/practice" className="shrink-0 self-start">
+      <ButtonLink href={view.topicId ? `/practice?topic=${encodeURIComponent(view.topicId)}` : "/practice"} className="shrink-0 self-start">
         Practise
         <AppIcon icon={ArrowRight01Icon} size={16} strokeWidth={2.25} />
       </ButtonLink>
